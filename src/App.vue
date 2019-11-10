@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <v-alert type="error" v-if="showError">{{showError}}</v-alert>
+    <v-alert type="success" v-if="showError">{{showError}}</v-alert>
     <router-view />
   </v-app>
 </template>
@@ -14,6 +15,7 @@ import * as MessageStatus from "@/models/status/message";
 @Component()
 export default class App extends Vue {
   showError = "";
+  showSuccess = "";
 
   created() {
     EventBus.$on("system-alert", msg => {
@@ -22,6 +24,12 @@ export default class App extends Vue {
           this.showError = msg.message;
           setTimeout(() => {
             this.showError = "";
+          }, 2000);
+          break;
+        case MessageStatus.MsgPopupType.Success:
+          this.showSuccess = msg.message;
+          setTimeout(() => {
+            this.showSuccess = "";
           }, 2000);
           break;
 

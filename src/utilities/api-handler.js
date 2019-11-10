@@ -8,7 +8,7 @@ import {
 
 class HttpModel {
 	constructor() {}
-	async request(cfg, authNeeded = false) {
+	async request(cfg, authNeeded = true) {
 		const instance = axios.create();
 		const token = Cookies.get('token')
 		cfg.baseURL = process.env.VUE_APP_API_URL

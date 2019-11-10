@@ -7,8 +7,15 @@ export default {
 			method: 'post',
 			data,
 		};
+		const result = await Handler.request(config, false);
+		return result.data;
+	},
+	async getCustomers() {
+		const config = {
+			url: `/customers`,
+			method: 'get',
+		};
 		const result = await Handler.request(config);
 		return result.data;
 	},
-
 }
