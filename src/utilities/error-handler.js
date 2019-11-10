@@ -1,13 +1,20 @@
+import {
+    SystemAlert
+} from '@/utilities/event-bus';
+import {
+    MsgPopupType
+} from '@/models/status/message'
+
 const responseSuccess = (response) => {
     return Promise.resolve(response);
 };
 
 const responseFail = (errorData) => {
     if (!errorData.response.data) {
-        alert("internal server error")
+        SystemAlert(MsgPopupType.Error, "Internal Server Error!")
         return Promise.reject(errorData);
     }
-    alert(errorData.response.data.message)
+    SystemAlert(MsgPopupType.Error, errorData.response.data.message);
     return Promise.reject(errorData);
 };
 
