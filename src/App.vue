@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-alert type="error" v-if="showError">{{showError}}</v-alert>
-    <v-alert type="success" v-if="showError">{{showError}}</v-alert>
+    <v-alert type="success" v-if="showSuccess">{{showSuccess}}</v-alert>
     <router-view />
   </v-app>
 </template>

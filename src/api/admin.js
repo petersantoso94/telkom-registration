@@ -18,4 +18,13 @@ export default {
 		const result = await Handler.request(config);
 		return result.data;
 	},
+	async updateCustomerStatus(data) {
+		const config = {
+			url: `/customer/${data.id}`,
+			method: 'put',
+			data,
+		};
+		const result = await Handler.request(config);
+		return result.data;
+	},
 }

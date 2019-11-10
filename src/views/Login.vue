@@ -51,6 +51,8 @@ export default class Login extends Vue {
       if (resp.success) {
         // redirect to dashboard
         Cookies.set("token", resp.token);
+        Cookies.set("admin_username", resp.admin_details.username);
+        Cookies.set("admin_id", resp.admin_details.id);
         this.$router.push({ name: "admin" });
       }
     });

@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Vuex from 'vuex';
+import Cookies from "js-cookie";
 
 Vue.use(Router);
 Vue.use(Vuex);
@@ -19,6 +20,16 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
+    if (to.name === 'login' && !!Cookies.get('token')) {
+        router.push({
+            name: "admin"
+        });
+    }
+    if (to.name === 'admin' && !Cookies.get('token')) {
+        router.push({
+            name: "login"
+        });
+    }
     next();
 });
 
