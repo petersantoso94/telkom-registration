@@ -1,10 +1,11 @@
 import Handler from '@/utilities/api-handler.js';
 
 export default {
-    async getBooks() {
+	async login(data) {
 		const config = {
-			url: `/books`,
-			method: 'get',
+			url: `/login`,
+			method: 'post',
+			data,
 		};
 		const result = await Handler.request(config);
 		return result.data;

@@ -8,13 +8,18 @@ const routes = [{
     path: '/Login',
     name: 'login',
     component: () => import('@/views/Login.vue'),
-}, ];
+}, {
+    path: '/Admin',
+    name: 'admin',
+    component: () => import('@/views/Admin.vue'),
+}];
 const router = new Router({
     mode: 'history',
     routes,
 });
 
 router.beforeEach((to, from, next) => {
+    console.log(to)
     next();
 });
 
