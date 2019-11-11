@@ -42,11 +42,6 @@ export default class App extends Vue {
 </script>
 
 <style>
-.custom-container {
-	margin: 0 auto;
-	width: 500px;
-	max-width: 700px;
-}
 #app {
 	font-family: "Avenir", Helvetica, Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;
