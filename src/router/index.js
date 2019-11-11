@@ -6,6 +6,10 @@ import Cookies from "js-cookie";
 Vue.use(Router);
 Vue.use(Vuex);
 const routes = [{
+    path: '/',
+    name: 'registration',
+    component: () => import('@/views/Registration.vue'),
+}, {
     path: '/Login',
     name: 'login',
     component: () => import('@/views/Login.vue'),
