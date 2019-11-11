@@ -1,0 +1,7 @@
+version: "3"
+services:
+  telinapp:
+    image: petersantoso/telin-registration-app:latest
+    restart: always
+    ports:
+      - 80:80
