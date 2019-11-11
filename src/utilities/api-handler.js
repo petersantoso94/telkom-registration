@@ -8,18 +8,18 @@ import {
 
 class HttpModel {
 	constructor() {}
-	async request(cfg, authNeeded = true) {
+	async request(cfg, authNeeded = true, contentType = "application/json") {
 		const instance = axios.create();
 		const token = Cookies.get('token')
 		cfg.baseURL = process.env.VUE_APP_API_URL
 		if (authNeeded) {
 			cfg.headers = {
 				Authorization: `Bearer ${token}`,
-				'content-type': 'application/json',
+				'content-type': contentType,
 			};
 		} else {
 			cfg.headers = {
-				'content-type': 'application/json',
+				'content-type': contentType,
 			};
 		}
 		let result;

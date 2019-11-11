@@ -1,5 +1,5 @@
 <template>
-	<v-app>
+	<v-app class="custom-container">
 		<v-alert type="error" v-if="showError">{{showError}}</v-alert>
 		<v-alert type="success" v-if="showSuccess">{{showSuccess}}</v-alert>
 		<router-view />
@@ -42,6 +42,11 @@ export default class App extends Vue {
 </script>
 
 <style>
+.custom-container {
+	margin: 0 auto;
+	width: 500px;
+	max-width: 700px;
+}
 #app {
 	font-family: "Avenir", Helvetica, Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;

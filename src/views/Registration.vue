@@ -1,7 +1,15 @@
 <template>
-	<v-app id="inspire" class="custom-container">
+	<v-app id="inspire">
+		<v-app-bar color="red accent-4" max-height="65" dark>
+			<img height="40" src="@/assets/logo.png" alt />
+			<v-toolbar-title height="60" class="font-weight-bold">Telin {{country}} - Form Registrasi</v-toolbar-title>
+		</v-app-bar>
 		<v-stepper v-model="steps" vertical>
-			<v-stepper-step :complete="steps > 1" step="1">Upload dokumen yang diperlukan</v-stepper-step>
+			<v-stepper-step
+				:complete="steps > 1"
+				color="red accent-4"
+				step="1"
+			>Upload dokumen yang diperlukan</v-stepper-step>
 			<v-stepper-content step="1">
 				<v-card color="grey lighten-2" class="mb-12" height="auto">
 					<v-form style="padding: 5px" ref="form" v-model="valid" lazy-validation>
@@ -62,17 +70,50 @@
 						></v-file-input>
 					</v-form>
 				</v-card>
-				<v-btn color="primary" @click="submitFirst" style="margin-top:-10px; margin-bottom:5px;">Next</v-btn>
-				<v-btn text @click="clear" style="margin-top:-10px; margin-bottom:5px;">Clear</v-btn>
+				<v-btn color="red" @click="submitFirst" style="margin-top:-10px; margin-bottom:5px;">Lanjut</v-btn>
+				<v-btn text @click="clear" style="margin-top:-10px; margin-bottom:5px;">Hapus</v-btn>
 			</v-stepper-content>
-			<v-stepper-step :complete="steps > 2" step="2">Configure analytics for this app</v-stepper-step>
+			<v-stepper-step :complete="steps > 2" color="red accent-4" step="2">Surat kuasa</v-stepper-step>
 
 			<v-stepper-content step="2">
-				<v-card color="grey lighten-2" class="mb-12" height="auto"></v-card>
-				<v-btn color="primary" @click="steps = 3">Submit</v-btn>
-				<v-btn text @click="steps = 1">Back</v-btn>
+				<v-card color="grey lighten-2" class="mb-12" height="auto">
+					<v-list dense>
+						<v-list-item>
+							<v-list-item-content>Surat Pernyataan:</v-list-item-content>
+						</v-list-item>
+						<v-list-item>
+							<v-list-item-content>Saya yang bertandatangan dibawah ini,</v-list-item-content>
+						</v-list-item>
+						<v-list-item>
+							<v-list-item-icon>
+								<v-icon>account_box</v-icon>
+							</v-list-item-icon>
+							<v-list-item-content>Nama: {{name}}</v-list-item-content>
+						</v-list-item>
+						<v-list-item>
+							<v-list-item-icon>
+								<v-icon>mdi-account-card-details</v-icon>
+							</v-list-item-icon>
+							<v-list-item-content>NIK: {{nik}}</v-list-item-content>
+						</v-list-item>
+						<v-list-item>
+							<v-list-item-icon>
+								<v-icon>phone</v-icon>
+							</v-list-item-icon>
+							<v-list-item-content>No Kartu As: {{phone}}</v-list-item-content>
+						</v-list-item>
+						<v-list-item>
+							<v-list-item-content>Bersedia memberikan kuasa kepada Telin {{country}} untuk melakukan registrasi nomor Kartu As Telkomsel</v-list-item-content>
+						</v-list-item>
+					</v-list>
+				</v-card>
+				<v-btn color="red" @click="register">Setuju</v-btn>
+				<v-btn text @click="steps = 1">Kembali</v-btn>
 			</v-stepper-content>
 		</v-stepper>
+		<v-overlay :value="showLoader">
+			<v-progress-circular indeterminate size="70"></v-progress-circular>
+		</v-overlay>
 	</v-app>
 </template>
 
@@ -81,9 +122,12 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { SystemAlert } from "@/utilities/event-bus";
 import { MsgPopupType } from "@/models/status/message";
+import registrationApi from "@/api/registration";
 
 @Component()
 export default class Login extends Vue {
+	country = "Taiwan";
+	showLoader = false;
 	pkkUrl = "";
 	pktpUrl = "";
 	pktp = [];
@@ -124,13 +168,58 @@ export default class Login extends Vue {
 		}
 	];
 
+	register() {
+		this.showLoader = true;
+		this.steps = 3;
+		let formData = new FormData();
+		formData.append("name", this.name);
+		formData.append("phone", this.phone);
+		formData.append("nik", this.nik);
+		formData.append("nokk", this.nokk);
+		formData.append("status", "pending");
+		formData.append("pkk", this.pkk);
+		formData.append("pktp", this.pktp);
+		// let registrationRequest = {
+		// 	name: this.name,
+		// 	phone: this.phone,
+		// 	nik: this.nik,
+		// 	nokk: this.nokk,
+		// 	pktp: this.pktp,
+		// 	pkk: this.pkk,
+		// 	status: "pending"
+		// };
+		registrationApi
+			.register(formData)
+			.then(resp => {
+				if (resp.success) {
+					SystemAlert(
+						MsgPopupType.Success,
+						"Pengumpulan surat kuasa berhasil"
+					);
+					this.clear();
+				} else {
+					this.steps = 2;
+					SystemAlert(
+						MsgPopupType.Error,
+						"Terjadi kesalahan pada server, silahkan kumpulkan ulang!"
+					);
+				}
+			})
+			.finally(() => {
+				this.showLoader = false;
+			});
+	}
+
 	clear() {
+		this.steps = 1;
 		this.name = "";
 		this.nik = "";
 		this.nokk = "";
 		this.phone = "";
 		this.pkk = [];
 		this.pktp = [];
+		this.pkkUrl = "";
+		this.pktpUrl = "";
 		this.$refs.form.resetValidation();
 	}
 
@@ -179,9 +268,4 @@ export default class Login extends Vue {
 </script>
 
 <style>
-.custom-container {
-	margin: 0 auto;
-	width: 500px;
-	max-width: 700px;
-}
 </style>
