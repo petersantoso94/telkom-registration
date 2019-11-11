@@ -52,6 +52,7 @@
 						<v-file-input
 							show-size
 							:rules="rules"
+							ref="pkkInput"
 							v-model="pkk"
 							@change="onPKKPicked"
 							accept="image/png, image/jpeg, image/bmp"
@@ -63,6 +64,7 @@
 							show-size
 							v-model="pktp"
 							:rules="rules"
+							ref="pktpInput"
 							@change="onPKTPPicked"
 							accept="image/png, image/jpeg, image/bmp"
 							prepend-icon="mdi-camera"
@@ -179,15 +181,6 @@ export default class Login extends Vue {
 		formData.append("status", "pending");
 		formData.append("pkk", this.pkk);
 		formData.append("pktp", this.pktp);
-		// let registrationRequest = {
-		// 	name: this.name,
-		// 	phone: this.phone,
-		// 	nik: this.nik,
-		// 	nokk: this.nokk,
-		// 	pktp: this.pktp,
-		// 	pkk: this.pkk,
-		// 	status: "pending"
-		// };
 		registrationApi
 			.register(formData)
 			.then(resp => {
@@ -196,7 +189,6 @@ export default class Login extends Vue {
 						MsgPopupType.Success,
 						"Pengumpulan surat kuasa berhasil"
 					);
-					this.clear();
 				} else {
 					this.steps = 2;
 					SystemAlert(
@@ -205,26 +197,28 @@ export default class Login extends Vue {
 					);
 				}
 			})
+			.catch(() => {
+				this.steps = 2;
+				SystemAlert(
+					MsgPopupType.Error,
+					"Terjadi kesalahan pada server, silahkan kumpulkan ulang!"
+				);
+			})
 			.finally(() => {
+				this.clear();
 				this.showLoader = false;
 			});
 	}
 
 	clear() {
 		this.steps = 1;
-		this.name = "";
-		this.nik = "";
-		this.nokk = "";
-		this.phone = "";
-		this.pkk = [];
-		this.pktp = [];
-		this.pkkUrl = "";
-		this.pktpUrl = "";
 		this.$refs.form.resetValidation();
+		this.$refs.form.reset();
 	}
 
 	onPKKPicked(files) {
-		if (files) {
+		if (!this.$refs.pkkInput.validate()) return;
+		if (files && files.name) {
 			const fr = new FileReader();
 			fr.readAsDataURL(files);
 			fr.addEventListener("load", () => {
@@ -236,7 +230,8 @@ export default class Login extends Vue {
 	}
 
 	onPKTPPicked(files) {
-		if (files) {
+		if (!this.$refs.pktpInput.validate()) return;
+		if (files && files.name) {
 			const fr = new FileReader();
 			fr.readAsDataURL(files);
 			fr.addEventListener("load", () => {
