@@ -390,10 +390,13 @@ export default class Login extends Vue {
   width: 22cm;
   height: 30cm;
   display: block;
+  padding: 20px;
   margin: 0 auto;
   box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
 }
 .pdfWrapper {
+  padding-right: 20px;
+  padding-top: 20px;
   background: white;
   width: 100%;
   height: 100%;
