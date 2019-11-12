@@ -32,8 +32,32 @@
 						</template>
 					</v-edit-dialog>
 				</template>
+
+				<template v-slot:item.pkk="{ item }">
+					<v-btn color="primary" @click="openPhoto(item.pkk)" fab small dark>
+						<v-icon>pageview</v-icon>
+					</v-btn>
+				</template>
+
+				<template v-slot:item.pktp="{ item }">
+					<v-btn color="primary" @click="openPhoto(item.pktp)" fab small dark>
+						<v-icon>pageview</v-icon>
+					</v-btn>
+				</template>
 			</v-data-table>
 		</v-card>
+		<v-dialog v-model="dialog" max-width="500">
+			<v-card>
+				<v-card-title class="headline">Telin</v-card-title>
+
+				<v-img :src="imgUrl" height="250" v-if="imgUrl" style="margin-left:5px;margin-right:5px;" />
+
+				<v-card-actions>
+					<v-spacer></v-spacer>
+					<v-btn color="green darken-1" text @click="dialog = false">Tutup</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
 		<v-snackbar v-model="snack" :timeout="2000" :color="snackColor">
 			{{ snackText }}
 			<v-btn text @click="snack = false">Close</v-btn>
@@ -50,6 +74,8 @@ import adminApi from "@/api/admin";
 @Component()
 export default class Login extends Vue {
 	snack = false;
+	dialog = false;
+	imgUrl = "";
 	selectStatus = ["approved", "rejected", "pending"];
 	snackColor = "";
 	snackText = "";
@@ -67,9 +93,26 @@ export default class Login extends Vue {
 		{ text: "Nomor Telpon", value: "phone" },
 		{ text: "NIK", value: "nik" },
 		{ text: "Nomor KK", value: "nokk" },
+		{ text: "Foto KK", value: "pkk" },
+		{ text: "Foto KTP", value: "pktp" },
 		{ text: "Status", value: "status" }
 	];
 	customers = [];
+
+	openPhoto(imageName) {
+		this.dialog = true;
+		this.imgUrl =
+			window.location.protocol +
+			"//" +
+			window.location.hostname +
+			":3000/uploads/" +
+			imageName;
+	}
+
+	closePhoto() {
+		this.dialog = false;
+		this.imgUrl = "";
+	}
 
 	getColor(status) {
 		switch (status) {
