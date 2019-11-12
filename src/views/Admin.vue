@@ -54,7 +54,13 @@
 		<v-dialog v-model="dialog" max-width="500">
 			<v-card>
 				<v-card-title class="headline">Telin</v-card-title>
-				<v-img :src="imgUrl" height="250" v-if="imgUrl" style="margin-left:5px;margin-right:5px;" />
+				<v-img
+					:src="imgUrl"
+					:contain="true"
+					height="250"
+					v-if="imgUrl"
+					style="margin-left:5px;margin-right:5px;"
+				/>
 				<v-card-actions>
 					<v-spacer></v-spacer>
 					<v-btn color="green darken-1" text @click="dialog = false">Tutup</v-btn>
