@@ -30,6 +30,13 @@
 							label="Nomor Telpon"
 							required
 						></v-text-field>
+						<div class="subheading text-left">Contoh:</div>
+						<v-img
+							:src="ktpexUrl"
+							:contain="true"
+							height="200"
+							style="margin-left:5px;margin-right:5px;"
+						/>
 						<v-text-field
 							v-model="nik"
 							prepend-icon="mdi-account-card-details"
@@ -39,6 +46,8 @@
 							label="Nomor Induk Kependudukan (NIK)"
 							required
 						></v-text-field>
+						<div class="subheading text-left">Contoh:</div>
+						<v-img :src="kkexUrl" height="200" :contain="true" style="margin-left:5px;margin-right:5px;" />
 						<v-text-field
 							v-model="nokk"
 							prepend-icon="mdi-account-card-details"
@@ -81,10 +90,10 @@
 				<v-card color="grey lighten-4" class="mb-12" height="auto">
 					<v-list dense>
 						<v-list-item>
-							<v-list-item-content>Surat Pernyataan:</v-list-item-content>
+							<v-list-item-content class="text-left">Surat Pernyataan:</v-list-item-content>
 						</v-list-item>
 						<v-list-item>
-							<v-list-item-content>Saya yang bertandatangan dibawah ini,</v-list-item-content>
+							<v-list-item-content class="text-left">Saya yang bertandatangan dibawah ini,</v-list-item-content>
 						</v-list-item>
 						<v-list-item>
 							<v-list-item-icon>
@@ -105,7 +114,9 @@
 							<v-list-item-content>No Kartu As: {{phone}}</v-list-item-content>
 						</v-list-item>
 						<v-list-item>
-							<v-list-item-content>Bersedia memberikan kuasa kepada Telin {{country}} untuk melakukan registrasi nomor Kartu As Telkomsel</v-list-item-content>
+							<v-list-item-content
+								class="text-left"
+							>Bersedia memberikan kuasa kepada Telin {{country}} untuk melakukan registrasi nomor Kartu As Telkomsel</v-list-item-content>
 						</v-list-item>
 					</v-list>
 				</v-card>
@@ -126,6 +137,8 @@ import { SystemAlert } from "@/utilities/event-bus";
 import { MsgPopupType } from "@/models/status/message";
 import registrationApi from "@/api/registration";
 import countryMapper from "@/models/json/country.json";
+import kk from "@/assets/kk.jpg";
+import ktp from "@/assets/ktp.jpg";
 
 @Component()
 export default class Login extends Vue {
@@ -133,6 +146,8 @@ export default class Login extends Vue {
 	showLoader = false;
 	pkkUrl = "";
 	pktpUrl = "";
+	kkexUrl = kk;
+	ktpexUrl = ktp;
 	pktp = [];
 	pkk = [];
 	steps = 1;
