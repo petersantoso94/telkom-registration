@@ -11,6 +11,7 @@
     "axios": "^0.19.0",
     "bootstrap": "^4.3.1",
     "core-js": "^3.3.2",
+    "file-saver": "^2.0.2",
     "html2canvas": "^1.0.0-rc.5",
     "js-cookie": "^2.2.1",
     "js-cookies": "^1.0.4",
@@ -61,5 +62,8 @@
   "browserslist": [
     "> 1%",
     "last 2 versions"
-  ]
+  ],
+  "resolutions": {
+    "jspdf/file-saver": "github:eligrey/FileSaver.js#e865e37af9f9947ddcced76b549e27dc45c1cb2e"
+  }
 }
