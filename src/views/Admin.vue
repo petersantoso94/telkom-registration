@@ -1,116 +1,187 @@
 <template>
-	<v-app id="inspire">
-		<v-card>
-			<v-card-title>
-				Customers
-				<v-spacer></v-spacer>
-				<v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details></v-text-field>
-			</v-card-title>
-			<v-data-table
-				v-model="selected"
-				:headers="headers"
-				:items="customers"
-				:search="search"
-				item-key="id"
-				class="elevation-1"
-			>
-				<template v-slot:item.status="{ item }">
-					<v-edit-dialog @save="save(item)" @cancel="cancel" @open="open" @close="close">
-						<v-chip :color="getColor(item.status)" dark>{{ item.status }}</v-chip>
-						<template v-slot:input>
-							<v-select
-								v-model="item.status"
-								:hint="`tekan 'enter' untuk menyimpan`"
-								:items="selectStatus"
-								item-text="text"
-								item-value="value"
-								label="status"
-								persistent-hint
-								return-value
-								single-line
-							></v-select>
-						</template>
-					</v-edit-dialog>
-				</template>
+  <v-app id="inspire">
+    <v-card>
+      <v-card-title>
+        Customers
+        <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+        <v-btn class="ma-2" tile outlined color="success" @click="exportExcel">
+          <v-icon left>mdi-export</v-icon>Export
+        </v-btn>
+        <v-btn class="ma-2" tile outlined color="success" @click="showUploadExcel = true">
+          <v-icon left>mdi-import</v-icon>Import Mapping
+        </v-btn>
+        <v-spacer></v-spacer>
+        <v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details></v-text-field>
+      </v-card-title>
+      <v-data-table
+        v-model="selected"
+        :headers="headers"
+        :items="customers"
+        :search="search"
+        item-key="id"
+        class="elevation-1"
+      >
+        <template v-slot:item.status="{ item }">
+          <v-edit-dialog @save="save(item)" @cancel="cancel" @open="open" @close="close">
+            <v-chip :color="getColor(item.status)" dark>{{ item.status }}</v-chip>
+            <template v-slot:input>
+              <v-select
+                v-model="item.status"
+                :hint="`tekan 'enter' untuk menyimpan`"
+                :items="selectStatus"
+                item-text="text"
+                item-value="value"
+                label="status"
+                persistent-hint
+                return-value
+                single-line
+              ></v-select>
+            </template>
+          </v-edit-dialog>
+        </template>
 
-				<template v-slot:item.pkk="{ item }">
-					<v-btn color="primary" v-if="item.pkk" @click="openPhoto(item.pkk)" fab small dark>
-						<v-icon>pageview</v-icon>
-					</v-btn>
-				</template>
+        <template v-slot:item.pkk="{ item }">
+          <v-btn color="primary" v-if="item.pkk" @click="openPhoto(item.pkk)" fab small dark>
+            <v-icon>pageview</v-icon>
+          </v-btn>
+        </template>
 
-				<template v-slot:item.pktp="{ item }">
-					<v-btn color="primary" v-if="item.pktp" @click="openPhoto(item.pktp)" fab small dark>
-						<v-icon>pageview</v-icon>
-					</v-btn>
-				</template>
-				<template v-slot:item.updated_at="{ item }">
-					<v-btn color="primary" @click="showPDF(item.id)" fab small dark>
-						<v-icon>picture_as_pdf</v-icon>
-					</v-btn>
-				</template>
-			</v-data-table>
-		</v-card>
-		<v-dialog v-model="dialog" max-width="500">
-			<v-card>
-				<v-card-title class="headline">Telin</v-card-title>
-				<v-img
-					:src="imgUrl"
-					:contain="true"
-					height="250"
-					v-if="imgUrl"
-					style="margin-left:5px;margin-right:5px;"
-				/>
-				<v-card-actions>
-					<v-spacer></v-spacer>
-					<v-btn color="green darken-1" text @click="dialog = false">Tutup</v-btn>
-				</v-card-actions>
-			</v-card>
-		</v-dialog>
-		<v-dialog v-model="pdfDialog" fullscreen hide-overlay transition="dialog-bottom-transition">
-			<v-card>
-				<v-toolbar dark color="primary">
-					<v-btn icon dark @click="pdfDialog = false">
-						<v-icon>mdi-close</v-icon>
-					</v-btn>
-					<v-toolbar-title>Surat Kuasa dari: {{selectedCustomerPDF.name}}</v-toolbar-title>
-					<v-spacer></v-spacer>
-					<v-toolbar-items>
-						<v-btn dark text @click="exportPDF">Export</v-btn>
-					</v-toolbar-items>
-				</v-toolbar>
-				<v-list dense id="pdf-for-print" class="pdfa4paper">
-					<div class="pdfWrapper">
-						<v-list-item>
-							<v-list-item-content class="text-left">Surat Pernyataan:</v-list-item-content>
-						</v-list-item>
-						<v-list-item>
-							<v-list-item-content class="text-left">Saya yang bertandatangan dibawah ini,</v-list-item-content>
-						</v-list-item>
-						<v-spacer></v-spacer>
-						<v-list-item>
-							<v-list-item-content class="text-left">Nama: {{selectedCustomerPDF.name}}</v-list-item-content>
-						</v-list-item>
-						<v-list-item>
-							<v-list-item-content class="text-left">NIK: {{selectedCustomerPDF.nik}}</v-list-item-content>
-						</v-list-item>
-						<v-list-item>
-							<v-list-item-content class="text-left">No Kartu As: {{selectedCustomerPDF.phone}}</v-list-item-content>
-						</v-list-item>
-						<v-list-item>
-							<v-list-item-content
-								class="text-left"
-							>Bersedia memberikan kuasa kepada Telin {{selectedCustomerPDF.country}} untuk melakukan registrasi nomor Kartu As Telkomsel</v-list-item-content>
-						</v-list-item>
-					</div>
-				</v-list>
-			</v-card>
-		</v-dialog>
-		<v-snackbar v-model="snack" :timeout="2000" :color="snackColor">
-			{{ snackText }}
-			<v-btn text @click="snack = false">Close</v-btn>
-		</v-snackbar>
-	</v-app>
+        <template v-slot:item.pktp="{ item }">
+          <v-btn color="primary" v-if="item.pktp" @click="openPhoto(item.pktp)" fab small dark>
+            <v-icon>pageview</v-icon>
+          </v-btn>
+        </template>
+        <template v-slot:item.updated_at="{ item }">
+          <v-btn color="primary" @click="showPDF(item.id)" fab small dark>
+            <v-icon>picture_as_pdf</v-icon>
+          </v-btn>
+        </template>
+      </v-data-table>
+    </v-card>
+    <v-dialog v-model="dialog" max-width="1000">
+      <v-card>
+        <v-card-title class="headline">Telin</v-card-title>
+        <v-img
+          :src="imgUrl"
+          :contain="true"
+          height="750"
+          v-if="imgUrl"
+          style="margin-left:5px;margin-right:5px;"
+        />
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text @click="dialog = false">Tutup</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="showUploadExcel" max-width="1000">
+      <v-card style="padding:0px 10px;">
+        <v-card-title class="headline">Unggah Mapper (kolom1: no.lokal, kolom2: no.indo)</v-card-title>
+        <v-file-input
+          show-size
+          v-model="excelFile"
+          ref="excelInput"
+          @change="uploadExcelFile"
+          accept="application/x-iwork-keynote-sffnumbers, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          prepend-icon="mdi-file"
+          label="Unggah Excel File"
+        ></v-file-input>
+        <v-card-actions>
+          <v-btn color="green darken-1" text @click="showUploadExcel = false">Tutup</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="pdfDialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-btn icon dark @click="pdfDialog = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+          <v-toolbar-title>Surat Kuasa dari: {{selectedCustomerPDF.name}}</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-toolbar-items>
+            <v-btn dark text @click="exportPDF">Export</v-btn>
+          </v-toolbar-items>
+        </v-toolbar>
+        <v-list dense id="pdf-for-print" class="pdfa4paper">
+          <div class="pdfWrapper">
+            <v-card class="d-flex flex-row justify-end" :flat="true">
+              <v-img
+                class="align-end"
+                :src="telinImg"
+                height="100"
+                max-width="100"
+                :contain="true"
+                v-if="telinImg"
+                style="margin-left:5px;margin-right:5px;"
+              />
+            </v-card>
+            <p class="title text-center">Surat Kuasa</p>
+            <v-list-item>
+              <v-list-item-content class="text-left">Saya yang bertandatangan dibawah ini,</v-list-item-content>
+            </v-list-item>
+            <v-spacer></v-spacer>
+            <v-container style="margin:5px">
+              <v-row no-gutters>
+                <v-col cols="12" sm="4">
+                  <v-card class="text-left" :flat="true">Nama</v-card>
+                </v-col>
+                <v-col cols="12" sm="4">
+                  <v-card class="text-left" :flat="true">: {{selectedCustomerPDF.name}}</v-card>
+                </v-col>
+              </v-row>
+              <v-row no-gutters>
+                <v-col cols="12" sm="4">
+                  <v-card class="text-left" :flat="true">NIK</v-card>
+                </v-col>
+                <v-col cols="12" sm="4">
+                  <v-card class="text-left" :flat="true">: {{selectedCustomerPDF.nik}}</v-card>
+                </v-col>
+              </v-row>
+              <v-row no-gutters>
+                <v-col cols="12" sm="4">
+                  <v-card class="text-left" :flat="true">No Kartu As</v-card>
+                </v-col>
+                <v-col cols="12" sm="4">
+                  <v-card class="text-left" :flat="true">: {{selectedCustomerPDF.phone}}</v-card>
+                </v-col>
+              </v-row>
+            </v-container>
+
+            <v-list-item>
+              <p
+                class="text-left"
+              >Dengan ini memberikan kuasa Kepada Telekomunikasi International Taiwan Ltd untuk melakukan registrasi nomor Kartu As saya.</p>
+            </v-list-item>
+            <v-list-item>
+              <p
+                class="text-left"
+              >Demikian surat kuasa ini dibuat untuk dipergunakan sebagaimana mestinya</p>
+            </v-list-item>
+            <v-list-item>
+              <p
+                class="text-left"
+              >{{selectedCustomerPDF.country+", "+(selectedCustomerPDF.created_at?selectedCustomerPDF.created_at.split("T")[0]:"")}}</p>
+            </v-list-item>
+            <v-list-item>
+              <p class="text-left">Hormat Saya,</p>
+            </v-list-item>
+            <v-list-item>
+              <p class="text-left">{{selectedCustomerPDF.name}}</p>
+            </v-list-item>
+          </div>
+        </v-list>
+      </v-card>
+    </v-dialog>
+    <v-snackbar v-model="snack" :timeout="2000" :color="snackColor">
+      {{ snackText }}
+      <v-btn text @click="snack = false">Tutup</v-btn>
+    </v-snackbar>
+    <v-overlay :value="showLoader" style="z-index: 9999">
+      <v-progress-circular indeterminate size="70"></v-progress-circular>
+    </v-overlay>
+  </v-app>
 </template>
 
 <script>
@@ -119,147 +190,212 @@ import Component from "vue-class-component";
 import Cookies from "js-cookie";
 import adminApi from "@/api/admin";
 import html2canvas from "html2canvas";
+import { SystemAlert } from "@/utilities/event-bus";
+import { MsgPopupType } from "@/models/status/message";
 import jsPdf from "jspdf";
+import { json2excel } from "js2excel";
+import XLSX from "xlsx";
+import telin from "@/assets/telin.jpg";
 
 @Component()
 export default class Login extends Vue {
-	snack = false;
-	dialog = false;
-	pdfDialog = false;
-	imgUrl = "";
-	selectStatus = ["approved", "rejected", "pending"];
-	selectedCustomerPDF = {};
-	snackColor = "";
-	snackText = "";
-	singleSelect = false;
-	search = "";
-	selected = [];
-	adminDetail = {};
-	headers = [
-		{
-			text: "id",
-			align: "left",
-			value: "id"
-		},
-		{ text: "Nama", value: "name" },
-		{ text: "Nomor Telpon", value: "phone" },
-		{ text: "NIK", value: "nik" },
-		{ text: "Nomor KK", value: "nokk" },
-		{ text: "Foto KK", value: "pkk" },
-		{ text: "Foto KTP", value: "pktp" },
-		{ text: "Waktu Register", value: "created_at" },
-		{ text: "Status", value: "status" },
-		{ text: "Actions", value: "updated_at" }
-	];
-	customers = [];
+  snack = false;
+  dialog = false;
+  pdfDialog = false;
+  showUploadExcel = false;
+  showLoader = false;
+  imgUrl = "";
+  telinImg = telin;
+  selectStatus = ["approved", "rejected", "pending"];
+  selectedCustomerPDF = {};
+  snackColor = "";
+  snackText = "";
+  localnumber = [];
+  idnumber = [];
+  singleSelect = false;
+  search = "";
+  selected = [];
+  excelFile = [];
+  adminDetail = {};
+  headers = [
+    {
+      text: "id",
+      align: "left",
+      value: "id"
+    },
+    { text: "Nama", value: "name" },
+    { text: "Nomor Telpon", value: "phone" },
+    { text: "NIK", value: "nik" },
+    { text: "Nomor KK", value: "nokk" },
+    { text: "Foto KK", value: "pkk" },
+    { text: "Foto KTP", value: "pktp" },
+    { text: "Waktu Register", value: "created_at" },
+    { text: "Status", value: "status" },
+    { text: "Actions", value: "updated_at" }
+  ];
+  customers = [];
 
-	openPhoto(imageName) {
-		this.dialog = true;
-		this.imgUrl =
-			window.location.protocol +
-			"//" +
-			window.location.hostname +
-			":3000/uploads/" +
-			imageName;
-	}
+  uploadExcelFile(files) {
+    this.showLoader = true;
+    if (!files) {
+      this.showLoader = false;
+      return;
+    }
+    const fr = new FileReader();
+    fr.onload = e => {
+      // pre-process data
+      let binary = "";
+      let bytes = new Uint8Array(e.target.result);
+      let length = bytes.byteLength;
+      for (let i = 0; i < length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
 
-	closePhoto() {
-		this.dialog = false;
-		this.imgUrl = "";
-	}
+      /* read workbook */
+      let wb = XLSX.read(binary, { type: "binary" });
 
-	getColor(status) {
-		switch (status) {
-			case "pending":
-				return "orange";
-			case "rejected":
-				return "red";
-			case "approved":
-				return "green";
-			default:
-				break;
-		}
-	}
+      /* grab first sheet */
+      let wsname = wb.SheetNames[0];
+      let ws = wb.Sheets[wsname];
+      let data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+      //remove the first row: header
+      data.shift();
+      data.forEach(element => {
+        this.localnumber.push(element[0]);
+        this.idnumber.push(element[1]);
+      });
+      console.log(this.idnumber);
 
-	showPDF(id) {
-		this.selectedCustomerPDF = this.customers.filter(item => {
-			return item.id === id;
-		})[0];
-		this.pdfDialog = true;
-	}
+      this.showLoader = false;
+      this.snack = true;
+      this.snackColor = "success";
+      this.snackText = "Sukses upload data";
+    };
+    fr.readAsArrayBuffer(files);
+  }
 
-	exportPDF() {
-		const domElement = document.getElementById("pdf-for-print");
-		html2canvas(domElement, {
-			dpi: 300 // Set to 300 DPI
-		})
-			.then(canvas => {
-				const img = canvas.toDataURL("image/png");
-				const pdf = new jsPdf("p", "mm", "a4");
-				pdf.addImage(img, "JPEG", 0, -14, 211, 320);
-				pdf.save(
-					this.selectedCustomerPDF.country +
-						"-" +
-						this.selectedCustomerPDF.phone +
-						".pdf"
-				);
-			})
-			.finally(() => {
-				this.pdfDialog = false;
-			});
-	}
+  exportExcel() {
+    try {
+      json2excel({
+        data: this.customers,
+        name: "customer-registration-data",
+        formateDate: "yyyy/mm/dd"
+      });
+    } catch (e) {
+      SystemAlert(
+        MsgPopupType.Error,
+        "Terjadi kesalahan pada server, silahkan coba ulang!"
+      );
+    }
+  }
 
-	save(param) {
-		let { status, id } = param;
-		let updateCustomerRequest = {
-			status: status,
-			id: id,
-			admin_id: this.adminDetail.id
-		};
+  openPhoto(imageName) {
+    this.dialog = true;
+    this.imgUrl =
+      window.location.protocol +
+      "//" +
+      window.location.hostname +
+      ":3000/uploads/" +
+      imageName;
+  }
 
-		adminApi.updateCustomerStatus(updateCustomerRequest).then(resp => {
-			if (resp.success) {
-				this.snack = true;
-				this.snackColor = "success";
-				this.snackText = "Data saved";
-			}
-		});
-	}
-	cancel() {
-		this.snack = true;
-		this.snackColor = "error";
-		this.snackText = "Canceled";
-	}
-	open() {
-		this.snack = true;
-		this.snackColor = "info";
-		this.snackText = "Dialog opened";
-	}
-	close() {}
+  closePhoto() {
+    this.dialog = false;
+    this.imgUrl = "";
+  }
 
-	mounted() {
-		this.adminDetail = {
-			username: Cookies.get("admin_username") || "admin",
-			id: Cookies.get("admin_id") || "1"
-		};
-		adminApi.getCustomers().then(resp => {
-			this.customers = resp;
-		});
-	}
+  getColor(status) {
+    switch (status) {
+      case "pending":
+        return "orange";
+      case "rejected":
+        return "red";
+      case "approved":
+        return "green";
+      default:
+        break;
+    }
+  }
+
+  showPDF(id) {
+    this.selectedCustomerPDF = this.customers.filter(item => {
+      return item.id === id;
+    })[0];
+    this.pdfDialog = true;
+  }
+
+  exportPDF() {
+    const domElement = document.getElementById("pdf-for-print");
+    html2canvas(domElement, {
+      dpi: 300 // Set to 300 DPI
+    })
+      .then(canvas => {
+        const img = canvas.toDataURL("image/png");
+        const pdf = new jsPdf("p", "mm", "a4");
+        pdf.addImage(img, "JPEG", 0, -14, 211, 320);
+        pdf.save(
+          this.selectedCustomerPDF.country +
+            "-" +
+            this.selectedCustomerPDF.phone +
+            ".pdf"
+        );
+      })
+      .finally(() => {
+        this.pdfDialog = false;
+      });
+  }
+
+  save(param) {
+    let { status, id } = param;
+    let updateCustomerRequest = {
+      status: status,
+      id: id,
+      admin_id: this.adminDetail.id
+    };
+
+    adminApi.updateCustomerStatus(updateCustomerRequest).then(resp => {
+      if (resp.success) {
+        this.snack = true;
+        this.snackColor = "success";
+        this.snackText = "Sukses menyimpan data";
+      }
+    });
+  }
+  cancel() {
+    this.snack = true;
+    this.snackColor = "error";
+    this.snackText = "Dibatalkan";
+  }
+  open() {
+    this.snack = true;
+    this.snackColor = "info";
+    this.snackText = "Mengubah";
+  }
+  close() {}
+
+  mounted() {
+    this.adminDetail = {
+      username: Cookies.get("admin_username") || "admin",
+      id: Cookies.get("admin_id") || "1"
+    };
+    adminApi.getCustomers().then(resp => {
+      this.customers = resp;
+    });
+  }
 }
 </script>
 
 <style>
 .pdfa4paper {
-	width: 22cm;
-	height: 30cm;
-	display: block;
-	margin: 0 auto;
-	box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+  width: 22cm;
+  height: 30cm;
+  display: block;
+  margin: 0 auto;
+  box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
 }
 .pdfWrapper {
-	background: white;
-	width: 100%;
-	height: 100%;
+  background: white;
+  width: 100%;
+  height: 100%;
 }
 </style>
