@@ -27,4 +27,21 @@ export default {
 		const result = await Handler.request(config);
 		return result.data;
 	},
+	async updateMapper(data) {
+		const config = {
+			url: `/mapper`,
+			method: 'post',
+			data,
+		};
+		const result = await Handler.request(config);
+		return result.data;
+	},
+	async getIdPhone(data) {
+		const config = {
+			url: `/mapper/${data.localphone}`,
+			method: 'get',
+		};
+		const result = await Handler.request(config);
+		return result.data;
+	},
 }
