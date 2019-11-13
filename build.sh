@@ -1,0 +1,1 @@
+docker image rm petersantoso/telin-registration-app && docker build --no-cache -t petersantoso/telin-registration-app:latest . && docker push petersantoso/telin-registration-app:latest
