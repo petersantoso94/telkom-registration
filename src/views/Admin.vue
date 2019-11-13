@@ -75,9 +75,10 @@
 				</v-card-actions>
 			</v-card>
 		</v-dialog>
-		<v-dialog v-model="showUploadExcel" max-width="1000">
+		<v-dialog v-model="showUploadExcel" max-width="500">
 			<v-card style="padding:0px 10px;">
-				<v-card-title class="headline">Unggah Mapper (kolom1: no.lokal, kolom2: no.indo)</v-card-title>
+				<v-card-title class="headline">Unggah Mapper</v-card-title>
+				<v-card-title class="headline">(kolom1: no.lokal, kolom2: no.indo)</v-card-title>
 				<v-file-input
 					show-size
 					v-model="excelFile"
@@ -95,7 +96,9 @@
 		<v-dialog v-model="pdfDialog" fullscreen hide-overlay transition="dialog-bottom-transition">
 			<v-card>
 				<v-toolbar dark color="primary">
-					<v-btn icon dark @click="pdfDialog = false">
+					<v-btn icon dark @click="()=>{
+						selectedCustomerPDF ={}
+						pdfDialog = false}">
 						<v-icon>mdi-close</v-icon>
 					</v-btn>
 					<v-toolbar-title>Surat Kuasa dari: {{selectedCustomerPDF.name}}</v-toolbar-title>
@@ -113,11 +116,11 @@
 						>
 							<v-img
 								class="align-end"
-								:src="telinImg"
+								:src="telinImg[selectedCustomerPDF.country]"
 								height="100"
 								max-width="100"
 								:contain="true"
-								v-if="telinImg"
+								v-if="telinImg[selectedCustomerPDF.country]"
 								style="margin-left:5px;margin-right:5px;box-shadow: 0px 0px 0px #FFFFFF !important;"
 							/>
 						</v-card>
@@ -194,6 +197,16 @@
 							<p class="text-left">Hormat Saya,</p>
 						</v-list-item>
 						<v-list-item>
+							<v-img
+								crossorigin="anonymous"
+								:src="selectedCustomerPDF.psignUrl"
+								height="100"
+								max-width="100"
+								:contain="true"
+								style="margin-left:5px;margin-right:5px;box-shadow: 0px 0px 0px #FFFFFF !important;"
+							/>
+						</v-list-item>
+						<v-list-item>
 							<p class="text-left">{{selectedCustomerPDF.name}}</p>
 						</v-list-item>
 					</div>
@@ -221,7 +234,9 @@ import { MsgPopupType } from "@/models/status/message";
 import jsPdf from "jspdf";
 import { json2excel } from "js2excel";
 import XLSX from "xlsx";
-import telin from "@/assets/telin.jpg";
+import telinHk from "@/assets/telin-Hongkong.jpg";
+import telinMalay from "@/assets/telin-Malaysia.jpg";
+import telinTw from "@/assets/telin-Taiwan.jpg";
 import localMapper from "@/models/json/country.json";
 
 @Component()
@@ -232,7 +247,11 @@ export default class Login extends Vue {
 	showUploadExcel = false;
 	showLoader = false;
 	imgUrl = "";
-	telinImg = telin;
+	telinImg = {
+		Taiwan: telinTw,
+		Malaysia: telinMalay,
+		Hongkong: telinHk
+	};
 	selectStatus = ["approved", "rejected", "pending"];
 	selectedCustomerPDF = {};
 	snackColor = "";
@@ -316,11 +335,12 @@ export default class Login extends Vue {
 						this.snack = true;
 						this.snackColor = "error";
 						this.snackText =
-							"Terjadi kesalahan pada server, silahkan coba upload lagi setelah refresh browser";
+							"File excel yang di unggah mengandung duplikasi pada kolom-2: nomor-indo";
 					}
 				})
 				.finally(() => {
 					this.showLoader = false;
+					this.showUploadExcel = false;
 				});
 		};
 		fr.readAsArrayBuffer(files);
@@ -373,6 +393,12 @@ export default class Login extends Vue {
 		this.selectedCustomerPDF = this.customers.filter(item => {
 			return item.id === id;
 		})[0];
+		this.selectedCustomerPDF.psignUrl =
+			window.location.protocol +
+			"//" +
+			window.location.hostname +
+			":3000/uploads/" +
+			this.selectedCustomerPDF.psign;
 		const requestOption = {
 			localphone: this.selectedCustomerPDF.phone
 		};
@@ -396,7 +422,8 @@ export default class Login extends Vue {
 		const domElement = document.getElementById("pdf-for-print");
 		html2canvas(domElement, {
 			dpi: 300, // Set to 300 DPI
-			scale: 2
+			scale: 2,
+			useCORS: true
 		})
 			.then(canvas => {
 				const img = canvas.toDataURL("image/png");
@@ -411,6 +438,7 @@ export default class Login extends Vue {
 			})
 			.finally(() => {
 				this.pdfDialog = false;
+				this.selectedCustomerPDF = {};
 			});
 	}
 
