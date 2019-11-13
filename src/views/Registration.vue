@@ -220,7 +220,7 @@ export default class Login extends Vue {
 	};
 	nameRules = [
 		v => !!v || "Harap isi nama anda",
-		v => (v && v.length <= 50) || "Nama harus kurang dari 50 karakter"
+		v => (v && v.length <= 50) || "Nama harus kurang dari 50 huruf"
 	];
 	phone = "";
 	phoneRules = [
@@ -230,21 +230,19 @@ export default class Login extends Vue {
 		},
 		v => {
 			if (this.mapCountry(v)) return true;
-			return "Nomor telpon bukan nomor Kartu As";
+			return "Nomor telpon bukan nomor As 2in1";
 		},
-		v =>
-			(v && v.length <= 30) ||
-			"Nomor telpon harus kurang dari 30 karakter"
+		v => (v && v.length <= 30) || "Nomor telpon harus kurang dari 30 angka"
 	];
 	nik = "";
 	nikRules = [
 		v => !!v || "Harap isi NIK anda",
-		v => (v && v.length === 16) || "NIK harus terdiri dari 16 karakter"
+		v => (v && v.length === 16) || "NIK harus terdiri dari 16 angka"
 	];
 	nokk = "";
 	nokkRules = [
 		v => !!v || "Harap isi NOKK anda",
-		v => (v && v.length === 16) || "NOKK harus terdiri dari 16 karakter"
+		v => (v && v.length === 16) || "NOKK harus terdiri dari 16 angka"
 	];
 	rulespktp = [
 		value => {

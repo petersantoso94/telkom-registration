@@ -140,7 +140,7 @@
 								</v-col>
 								<v-col cols="12" sm="4">
 									<v-card
-										class="text-left"
+										class="text-left text-capitalize"
 										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
 										:flat="true"
 									>: {{selectedCustomerPDF.name}}</v-card>
