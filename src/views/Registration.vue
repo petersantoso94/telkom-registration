@@ -34,6 +34,8 @@
 							v-model="nik"
 							prepend-icon="mdi-account-card-details"
 							type="number"
+							oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+							maxlength="16"
 							:counter="16"
 							:rules="nikRules"
 							label="Nomor Induk Kependudukan (NIK)"
@@ -50,6 +52,8 @@
 							v-model="nokk"
 							prepend-icon="mdi-account-card-details"
 							type="number"
+							oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+							maxlength="16"
 							:counter="16"
 							:rules="nokkRules"
 							label="Nomor Kartu Keluarga (NOKK)"
@@ -199,6 +203,8 @@ import ktp from "@/assets/ktp.jpg";
 
 @Component()
 export default class Login extends Vue {
+	maxSize = 10000000; // 10 mb
+	errorMaxSize = "10 MB";
 	country = "";
 	showLoader = false;
 	showSignPad = false;
@@ -212,6 +218,8 @@ export default class Login extends Vue {
 	pktp = [];
 	pkk = [];
 	psign = [];
+	pkkFile = [];
+	pktpFile = [];
 	steps = 1;
 	valid = true;
 	name = "";
@@ -249,8 +257,8 @@ export default class Login extends Vue {
 			if (!value) {
 				return true;
 			}
-			if (value.size >= 2000000) {
-				return "Foto yang diupload tidak boleh melebihi 2 MB!";
+			if (value.size >= this.maxSize) {
+				return `Foto yang diupload tidak boleh melebihi ${this.errorMaxSize}!`;
 			}
 			return true;
 		}
@@ -263,8 +271,8 @@ export default class Login extends Vue {
 			return true;
 		},
 		value => {
-			if (!value || value.size >= 2000000) {
-				return "Foto yang diupload tidak boleh melebihi 2 MB!";
+			if (!value || value.size >= this.maxSize) {
+				return `Foto yang diupload tidak boleh melebihi ${this.errorMaxSize}!`;
 			}
 			return true;
 		}
@@ -280,8 +288,8 @@ export default class Login extends Vue {
 		formData.append("nokk", this.nokk);
 		formData.append("status", "pending");
 		formData.append("country", this.country);
-		formData.append("pkk", this.pkk);
-		formData.append("pktp", this.pktp);
+		formData.append("pkk", this.pkkFile);
+		formData.append("pktp", this.pktpFile);
 		formData.append("psign", this.psign);
 		registrationApi
 			.register(formData)
@@ -319,6 +327,8 @@ export default class Login extends Vue {
 		this.$refs.form.reset();
 		this.pkk = undefined;
 		this.pktp = undefined;
+		this.pkkFile = [];
+		this.pktpFile = [];
 	}
 
 	onPKKPicked(files) {
@@ -327,13 +337,13 @@ export default class Login extends Vue {
 			return;
 		}
 		if (files && files.name) {
-			const fr = new FileReader();
-			fr.readAsDataURL(files);
-			fr.addEventListener("load", () => {
-				this.pkkUrl = fr.result;
+			this.resizeImage(files).then(dataurl => {
+				this.pkkFile = this.dataUrlToBlob(dataurl);
+				this.pkkUrl = dataurl;
 			});
 		} else {
 			this.pkkUrl = "";
+			this.pkkFile = [];
 		}
 	}
 
@@ -343,14 +353,67 @@ export default class Login extends Vue {
 			return;
 		}
 		if (files && files.name) {
-			const fr = new FileReader();
-			fr.readAsDataURL(files);
-			fr.addEventListener("load", () => {
-				this.pktpUrl = fr.result;
+			this.resizeImage(files).then(dataurl => {
+				this.pktpFile = this.dataUrlToBlob(dataurl);
+				this.pktpUrl = dataurl;
 			});
 		} else {
 			this.pktpUrl = "";
+			this.pktpFile = [];
 		}
+	}
+
+	//return blob and dataurl
+	resizeImage(files) {
+		return new Promise((resolve, reject) => {
+			const img = new Image();
+			const canvas = document.createElement("canvas");
+			img.onload = () => {
+				try {
+					const MAX_WIDTH = 800;
+					const MAX_HEIGHT = 600;
+					let width = img.width;
+					let height = img.height;
+
+					if (width > height) {
+						if (width > MAX_WIDTH) {
+							height *= MAX_WIDTH / width;
+							width = MAX_WIDTH;
+						}
+					} else {
+						if (height > MAX_HEIGHT) {
+							width *= MAX_HEIGHT / height;
+							height = MAX_HEIGHT;
+						}
+					}
+					canvas.width = width;
+					canvas.height = height;
+					let ctx = canvas.getContext("2d");
+					ctx.drawImage(img, 0, 0, width, height);
+					let dataurl = canvas.toDataURL("image/png");
+					resolve(dataurl);
+				} catch (error) {
+					reject(error);
+				}
+			};
+			const fr = new FileReader();
+			fr.readAsDataURL(files);
+			fr.addEventListener("load", () => {
+				img.src = fr.result;
+			});
+		});
+	}
+
+	dataUrlToBlob(dataurl) {
+		// Split the base64 string in data and contentType
+		const block = dataurl.split(";");
+		// Get the content type of the image
+		const contentType = block[0].split(":")[1];
+		// get the real base64 content of the file
+		const realData = block[1].split(",")[1];
+		// Convert it to a blob to upload
+		const blob = this.b64toBlob(realData, contentType);
+		return blob;
 	}
 
 	submitFirst() {
@@ -380,16 +443,8 @@ export default class Login extends Vue {
 			this.snackText = "Tolong tanda tangan pada kotak yang disediakan";
 			return;
 		}
-		// Split the base64 string in data and contentType
-		const block = data.split(";");
-		// Get the content type of the image
-		const contentType = block[0].split(":")[1]; // In this case "image/gif"
-		// get the real base64 content of the file
-		const realData = block[1].split(",")[1];
-		// Convert it to a blob to upload
-		const blob = this.b64toBlob(realData, contentType);
 
-		this.psign = blob;
+		this.psign = this.dataUrlToBlob(data);
 		this.steps++;
 	}
 
