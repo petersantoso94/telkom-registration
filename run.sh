@@ -1,1 +1,1 @@
-docker-compose stop telinapp && docker image rm petersantoso/telin-registration-app && docker-compose build --pull && docker-compose up -d
+docker-compose stop telinapp && docker image rm petersantoso/telin-registration-app -f && docker-compose build --pull && docker-compose up -d
