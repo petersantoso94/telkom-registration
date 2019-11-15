@@ -11,10 +11,14 @@ class HttpModel {
 	async request(cfg, authNeeded = true, contentType = "application/json") {
 		const instance = axios.create();
 		const token = Cookies.get('token')
-		cfg.baseURL = window.location.protocol +
-			"//" +
-			window.location.hostname +
-			":3000"
+		if (process.env.NODE_ENV === 'development') {
+			cfg.baseURL = window.location.protocol +
+				"//" +
+				window.location.hostname +
+				":3000"
+		} else {
+			cfg.url = '/api' + cfg.url;
+		}
 		if (authNeeded) {
 			cfg.headers = {
 				Authorization: `Bearer ${token}`,
