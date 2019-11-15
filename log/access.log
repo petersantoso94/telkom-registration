@@ -1,0 +1,2 @@
+202.39.238.100 - - [15/Nov/2019:08:23:38 +0000] "GET /Admin HTTP/1.1" 301 169 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36" "-"
+202.39.238.100 - - [15/Nov/2019:08:24:30 +0000] "GET / HTTP/1.1" 301 169 "http://180.240.136.75/login" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36" "-"

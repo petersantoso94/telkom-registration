@@ -8,3 +8,5 @@ services:
       - 443:443
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt
+      - ./nginx:/etc/nginx/conf.d
+      - ./log:/var/log/nginx
