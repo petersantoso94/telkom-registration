@@ -1,8 +1,10 @@
-version: "3"
+version: "3.5"
 services:
   telinapp:
     image: petersantoso/telin-registration-app:latest
     restart: always
+    networks:
+      - backend
     ports:
       - 80:80
       - 443:443
@@ -10,3 +12,6 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt
       - ./nginx:/etc/nginx/conf.d
       - ./log:/var/log/nginx
+networks:
+  backend:
+    name: telin_backend
