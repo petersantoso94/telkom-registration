@@ -124,9 +124,14 @@
 								style="margin-left:5px;margin-right:5px;box-shadow: 0px 0px 0px #FFFFFF !important;"
 							/>
 						</v-card>
-						<p class="title text-center">Surat Kuasa</p>
+						<p
+							class="title text-center font-weight-bold"
+							style="text-decoration: underline;"
+						>SURAT PERNYATAAN</p>
 						<v-list-item>
-							<v-list-item-content class="text-left">Saya yang bertandatangan dibawah ini,</v-list-item-content>
+							<v-list-item-content
+								class="text-left text-justify"
+							>Saya, yang bertanda tangan di bawah ini, menyatakan dengan hormat mengajukan permohonan bantuan kepada Bagian Pelayanan Pelanggan Telkomsel (“GraPARI”) untuk melakukan registrasi nomor As2in1 atas nama saya di bawah ini:</v-list-item-content>
 						</v-list-item>
 						<v-spacer></v-spacer>
 						<v-container style="margin:5px">
@@ -152,7 +157,23 @@
 										class="text-left"
 										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
 										:flat="true"
-									>NIK</v-card>
+									>Nomor As2in1</v-card>
+								</v-col>
+								<v-col cols="12" sm="4">
+									<v-card
+										class="text-left"
+										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
+										:flat="true"
+									>: {{selectedCustomerPDF.idphone}}</v-card>
+								</v-col>
+							</v-row>
+							<v-row no-gutters>
+								<v-col cols="12" sm="4">
+									<v-card
+										class="text-left"
+										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
+										:flat="true"
+									>Nomor KTP</v-card>
 								</v-col>
 								<v-col cols="12" sm="4">
 									<v-card
@@ -168,35 +189,46 @@
 										class="text-left"
 										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
 										:flat="true"
-									>No Kartu As</v-card>
+									>Nomor Kartu Keluarga</v-card>
 								</v-col>
 								<v-col cols="12" sm="4">
 									<v-card
 										class="text-left"
 										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
 										:flat="true"
-									>: {{selectedCustomerPDF.idphone}}</v-card>
+									>: {{selectedCustomerPDF.nokk}}</v-card>
 								</v-col>
 							</v-row>
 						</v-container>
 
 						<v-list-item>
-							<p
-								class="text-left"
-							>Dengan ini memberikan kuasa Kepada Telekomunikasi International {{selectedCustomerPDF.country}} Ltd untuk melakukan registrasi nomor Kartu As saya.</p>
+							<p class="text-left">Bersama dengan surat ini, saya menyatakan sebagai berikut:</p>
 						</v-list-item>
-						<v-list-item>
-							<p class="text-left">Demikian surat kuasa ini dibuat untuk dipergunakan sebagaimana mestinya</p>
-						</v-list-item>
-						<v-list-item>
+						<ul>
+							<li>
+								<v-list-item>
+									<p
+										class="text-left text-justify"
+									>Untuk keperluan registrasi pelanggan jasa telekomunikasi sebagaimana diatur dalam ketentuan peraturan perundangan-undangan, data-data yang disampaikan di atas adalah benar. Apabila saya memberikan data yang tidak sesuai dan bertentangan dengan peraturan perundang-undangan, maka saya bersedia menerima segala konsekuensi yang berlaku.</p>
+								</v-list-item>
+							</li>
+							<li>
+								<v-list-item>
+									<p
+										class="text-left text-justify"
+									>Saya secara berkala akan melakukan registrasi ulang untuk memastikan bahwa data-data yang saya sampaikan tervalidasi.</p>
+								</v-list-item>
+							</li>
+						</ul>
+						<v-list-item class="d-flex flex-row justify-end">
 							<p
-								class="text-left"
+								class="text-end"
 							>{{selectedCustomerPDF.country+", "+(selectedCustomerPDF.created_at?selectedCustomerPDF.created_at.split("T")[0]:"")}}</p>
 						</v-list-item>
-						<v-list-item>
-							<p class="text-left">Hormat Saya,</p>
+						<v-list-item class="d-flex flex-row justify-end">
+							<p class="text-end">Pelanggan</p>
 						</v-list-item>
-						<v-list-item>
+						<v-list-item class="d-flex flex-row justify-end">
 							<v-img
 								crossorigin="anonymous"
 								:src="selectedCustomerPDF.psignUrl"
@@ -206,8 +238,8 @@
 								style="margin-left:5px;margin-right:5px;box-shadow: 0px 0px 0px #FFFFFF !important;"
 							/>
 						</v-list-item>
-						<v-list-item>
-							<p class="text-left">{{selectedCustomerPDF.name}}</p>
+						<v-list-item class="d-flex flex-row justify-end">
+							<p class="text-end text-capitalize">( {{selectedCustomerPDF.name}} )</p>
 						</v-list-item>
 					</div>
 				</v-list>
@@ -246,6 +278,8 @@ export default class Login extends Vue {
 	pdfDialog = false;
 	showUploadExcel = false;
 	showLoader = false;
+	baseUrl = "";
+
 	imgUrl = "";
 	telinImg = {
 		Taiwan: telinTw,
@@ -363,12 +397,7 @@ export default class Login extends Vue {
 
 	openPhoto(imageName) {
 		this.dialog = true;
-		this.imgUrl =
-			window.location.protocol +
-			"//" +
-			window.location.hostname +
-			":3000/uploads/" +
-			imageName;
+		this.imgUrl = this.baseUrl + imageName;
 	}
 
 	closePhoto() {
@@ -394,11 +423,7 @@ export default class Login extends Vue {
 			return item.id === id;
 		})[0];
 		this.selectedCustomerPDF.psignUrl =
-			window.location.protocol +
-			"//" +
-			window.location.hostname +
-			":3000/uploads/" +
-			this.selectedCustomerPDF.psign;
+			this.baseUrl + this.selectedCustomerPDF.psign;
 		const requestOption = {
 			localphone: this.selectedCustomerPDF.phone
 		};
@@ -471,6 +496,16 @@ export default class Login extends Vue {
 	close() {}
 
 	mounted() {
+		if (process.env.NODE_ENV === "development") {
+			this.baseUrl =
+				window.location.protocol +
+				"//" +
+				window.location.hostname +
+				":3000/uploads/";
+		} else {
+			this.baseUrl = "/api/uploads/";
+		}
+
 		this.adminDetail = {
 			username: Cookies.get("admin_username") || "admin",
 			id: Cookies.get("admin_id") || "1"
@@ -497,5 +532,9 @@ export default class Login extends Vue {
 	background: white;
 	width: 100%;
 	height: 100%;
+}
+.text-justify {
+	text-align: justify;
+	text-justify: inter-word;
 }
 </style>

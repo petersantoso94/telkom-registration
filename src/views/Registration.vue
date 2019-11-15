@@ -108,43 +108,8 @@
 				<v-btn text @click="clear" style="margin-top:-10px; margin-bottom:5px;">Hapus</v-btn>
 			</v-stepper-content>
 
-			<v-stepper-step :complete="steps > 2" color="red accent-4" step="2">Tanda Tangan</v-stepper-step>
+			<v-stepper-step :complete="steps > 2" color="red accent-4" step="2">Surat kuasa</v-stepper-step>
 			<v-stepper-content step="2">
-				<v-card>
-					<v-row style="margin-left:5px">
-						<v-btn class="ma-1 align-left" small dark outlined color="black" @click="steps--">Kembali</v-btn>
-					</v-row>
-					<v-list dense>
-						<VueSignaturePad
-							id="signature"
-							width="100%"
-							height="400px"
-							ref="signaturePad"
-							:options="options"
-						/>
-						<v-row style="margin-left:-5px">
-							<v-card-actions class="align-left" style="margin-top:10px">
-								<v-btn
-									class="ma-1"
-									small
-									outlined
-									color="success"
-									@click="submitSecond"
-									style="margin-top:-10px; margin-bottom:5px;"
-								>
-									<v-icon left>save</v-icon>Simpan
-								</v-btn>
-								<v-btn class="ma-1" small dark outlined color="grey" @click="undoSign">
-									<v-icon left>mdi-undo</v-icon>Undo
-								</v-btn>
-							</v-card-actions>
-						</v-row>
-					</v-list>
-				</v-card>
-			</v-stepper-content>
-
-			<v-stepper-step :complete="steps > 3" color="red accent-4" step="3">Surat kuasa</v-stepper-step>
-			<v-stepper-content step="3">
 				<v-card color="grey lighten-4" class="mb-12" height="auto">
 					<v-list dense>
 						<v-list-item>
@@ -176,6 +141,25 @@
 								class="text-left"
 							>Bersedia memberikan kuasa kepada Telin {{country}} untuk melakukan registrasi nomor Kartu As Telkomsel</v-list-item-content>
 						</v-list-item>
+					</v-list>
+					<v-list-item>
+						<v-list-item-content class="text-left">Tanda Tangan:</v-list-item-content>
+					</v-list-item>
+					<v-list dense>
+						<VueSignaturePad
+							id="signature"
+							width="100%"
+							height="400px"
+							ref="signaturePad"
+							:options="options"
+						/>
+						<v-row style="margin-left:-5px">
+							<v-card-actions class="align-left" style="margin-top:10px">
+								<v-btn class="ma-1" small dark outlined color="grey" @click="undoSign">
+									<v-icon left>mdi-undo</v-icon>Undo
+								</v-btn>
+							</v-card-actions>
+						</v-row>
 					</v-list>
 				</v-card>
 				<v-btn outlined color="success" @click="register">Setuju</v-btn>
@@ -280,7 +264,11 @@ export default class Login extends Vue {
 
 	register() {
 		this.showLoader = true;
-		this.steps = 4;
+		if (!this.submitSign()) {
+			this.showLoader = false;
+			return;
+		}
+		this.steps = 3;
 		let formData = new FormData();
 		formData.append("name", this.name);
 		formData.append("phone", this.phone);
@@ -299,7 +287,7 @@ export default class Login extends Vue {
 					this.snackColor = "success";
 					this.snackText = "Pengumpulan surat kuasa berhasil";
 				} else {
-					this.steps = 3;
+					this.steps = 2;
 
 					this.snack = true;
 					this.snackColor = "error";
@@ -308,7 +296,7 @@ export default class Login extends Vue {
 				}
 			})
 			.catch(() => {
-				this.steps = 3;
+				this.steps = 2;
 				this.snack = true;
 				this.snackColor = "error";
 				this.snackText =
@@ -435,17 +423,18 @@ export default class Login extends Vue {
 		this.$refs.signaturePad.undoSignature();
 	}
 
-	submitSecond() {
+	submitSign() {
 		const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
 		if (isEmpty) {
 			this.snack = true;
 			this.snackColor = "error";
 			this.snackText = "Tolong tanda tangan pada kotak yang disediakan";
-			return;
+			this.showLoader = false;
+			return false;
 		}
 
 		this.psign = this.dataUrlToBlob(data);
-		this.steps++;
+		return true;
 	}
 
 	mapCountry(numb) {
