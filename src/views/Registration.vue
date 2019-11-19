@@ -112,23 +112,23 @@
 
 			<v-stepper-step :complete="steps > 2" color="red accent-4" step="2">Surat kuasa</v-stepper-step>
 			<v-stepper-content step="2">
-				<v-card color="grey lighten-4" class="mb-12" height="auto">
+				<v-card color="grey lighten-4" class="mb-12" height="auto" style="font-size:90%;">
 					<v-list dense>
 						<v-list-item>
 							<p
 								class="text-left text-justify"
 							>Saya, yang bertanda tangan di bawah ini, menyatakan dengan hormat mengajukan permohonan bantuan kepada Bagian Pelayanan Pelanggan Telkomsel (“GraPARI”) untuk melakukan registrasi nomor As2in1 atas nama saya di bawah ini:</p>
 						</v-list-item>
-						<v-container style="margin:5px">
+						<v-container style="margin:5px;">
 							<v-row no-gutters>
-								<v-col cols="12" sm="4">
+								<v-col cols="4" sm="4">
 									<v-card
 										class="text-left"
 										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
 										:flat="true"
 									>Nama</v-card>
 								</v-col>
-								<v-col cols="12" sm="4">
+								<v-col cols="6" sm="4">
 									<v-card
 										class="text-left text-capitalize"
 										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
@@ -137,14 +137,14 @@
 								</v-col>
 							</v-row>
 							<v-row no-gutters>
-								<v-col cols="12" sm="4">
+								<v-col cols="4" sm="4">
 									<v-card
 										class="text-left"
 										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
 										:flat="true"
-									>Nomor As2in1</v-card>
+									>No. As2in1</v-card>
 								</v-col>
-								<v-col cols="12" sm="4">
+								<v-col cols="7" sm="4">
 									<v-card
 										class="text-left"
 										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
@@ -153,14 +153,14 @@
 								</v-col>
 							</v-row>
 							<v-row no-gutters>
-								<v-col cols="12" sm="4">
+								<v-col cols="4" sm="4">
 									<v-card
 										class="text-left"
 										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
 										:flat="true"
-									>Nomor KTP</v-card>
+									>No. KTP</v-card>
 								</v-col>
-								<v-col cols="12" sm="4">
+								<v-col cols="7" sm="4">
 									<v-card
 										class="text-left"
 										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
@@ -169,14 +169,14 @@
 								</v-col>
 							</v-row>
 							<v-row no-gutters>
-								<v-col cols="12" sm="4">
+								<v-col cols="4" sm="4">
 									<v-card
 										class="text-left"
 										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
 										:flat="true"
-									>Nomor Kartu Keluarga</v-card>
+									>No. KK</v-card>
 								</v-col>
-								<v-col cols="12" sm="4">
+								<v-col cols="7" sm="4">
 									<v-card
 										class="text-left"
 										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
