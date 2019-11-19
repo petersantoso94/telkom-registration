@@ -25,7 +25,9 @@
 							v-model="phone"
 							prepend-icon="phone"
 							type="number"
-							:counter="30"
+							oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+							:maxlength="phoneMaxLength"
+							:counter="phoneMaxLength"
 							:rules="phoneRules"
 							label="Nomor Telpon"
 							required
@@ -112,34 +114,90 @@
 			<v-stepper-content step="2">
 				<v-card color="grey lighten-4" class="mb-12" height="auto">
 					<v-list dense>
+						<p
+							class="title text-center font-weight-bold"
+							style="text-decoration: underline;"
+						>SURAT PERNYATAAN</p>
 						<v-list-item>
-							<v-list-item-content class="text-left">Surat Pernyataan:</v-list-item-content>
+							<p
+								class="text-left text-justify"
+							>Saya, yang bertanda tangan di bawah ini, menyatakan dengan hormat mengajukan permohonan bantuan kepada Bagian Pelayanan Pelanggan Telkomsel (“GraPARI”) untuk melakukan registrasi nomor As2in1 atas nama saya di bawah ini:</p>
+						</v-list-item>
+						<v-container style="margin:5px">
+							<v-row no-gutters>
+								<v-col cols="12" sm="4">
+									<v-card
+										class="text-left"
+										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
+										:flat="true"
+									>Nama</v-card>
+								</v-col>
+								<v-col cols="12" sm="4">
+									<v-card
+										class="text-left text-capitalize"
+										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
+										:flat="true"
+									>: {{name}}</v-card>
+								</v-col>
+							</v-row>
+							<v-row no-gutters>
+								<v-col cols="12" sm="4">
+									<v-card
+										class="text-left"
+										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
+										:flat="true"
+									>Nomor As2in1</v-card>
+								</v-col>
+								<v-col cols="12" sm="4">
+									<v-card
+										class="text-left"
+										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
+										:flat="true"
+									>: {{phone}}</v-card>
+								</v-col>
+							</v-row>
+							<v-row no-gutters>
+								<v-col cols="12" sm="4">
+									<v-card
+										class="text-left"
+										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
+										:flat="true"
+									>Nomor KTP</v-card>
+								</v-col>
+								<v-col cols="12" sm="4">
+									<v-card
+										class="text-left"
+										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
+										:flat="true"
+									>: {{nik}}</v-card>
+								</v-col>
+							</v-row>
+							<v-row no-gutters>
+								<v-col cols="12" sm="4">
+									<v-card
+										class="text-left"
+										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
+										:flat="true"
+									>Nomor Kartu Keluarga</v-card>
+								</v-col>
+								<v-col cols="12" sm="4">
+									<v-card
+										class="text-left"
+										style="box-shadow: 0px 0px 0px #FFFFFF !important;"
+										:flat="true"
+									>: {{nokk}}</v-card>
+								</v-col>
+							</v-row>
+						</v-container>
+						<v-list-item>
+							<p
+								class="text-left text-justify"
+							>Untuk keperluan registrasi pelanggan jasa telekomunikasi sebagaimana diatur dalam ketentuan peraturan perundangan-undangan.</p>
 						</v-list-item>
 						<v-list-item>
-							<v-list-item-content class="text-left">Saya yang bertandatangan dibawah ini,</v-list-item-content>
-						</v-list-item>
-						<v-list-item>
-							<v-list-item-icon>
-								<v-icon>account_box</v-icon>
-							</v-list-item-icon>
-							<v-list-item-content>Nama: {{name}}</v-list-item-content>
-						</v-list-item>
-						<v-list-item>
-							<v-list-item-icon>
-								<v-icon>mdi-account-card-details</v-icon>
-							</v-list-item-icon>
-							<v-list-item-content>NIK: {{nik}}</v-list-item-content>
-						</v-list-item>
-						<v-list-item>
-							<v-list-item-icon>
-								<v-icon>phone</v-icon>
-							</v-list-item-icon>
-							<v-list-item-content>No Kartu As: {{phone}}</v-list-item-content>
-						</v-list-item>
-						<v-list-item>
-							<v-list-item-content
-								class="text-left"
-							>Bersedia memberikan kuasa kepada Telin {{country}} untuk melakukan registrasi nomor Kartu As Telkomsel</v-list-item-content>
+							<p
+								class="text-left text-justify"
+							>Data-data yang disampaikan di atas adalah benar. Apabila saya memberikan data yang tidak sesuai dan bertentangan dengan peraturan perundang-undangan, maka saya bersedia menerima segala konsekuensi yang berlaku.</p>
 						</v-list-item>
 					</v-list>
 					<v-list-item>
@@ -189,6 +247,7 @@ import ktp from "@/assets/ktp.jpg";
 export default class Login extends Vue {
 	maxSize = 10000000; // 10 mb
 	errorMaxSize = "10 MB";
+	phoneMaxLength = 30;
 	country = "";
 	showLoader = false;
 	showSignPad = false;
@@ -438,6 +497,7 @@ export default class Login extends Vue {
 	}
 
 	mapCountry(numb) {
+		this.phoneMaxLength = 30;
 		if (!numb) return false;
 		numb = numb.toString();
 		let found = false;
@@ -450,6 +510,8 @@ export default class Login extends Vue {
 				) {
 					found = true;
 					this.country = element.country;
+					if (element.country === "Hongkong")
+						this.phoneMaxLength = element.total;
 				}
 			});
 		});
@@ -494,5 +556,9 @@ export default class Login extends Vue {
 #signature {
 	border: solid 1px black;
 	border-radius: 5px;
+}
+.text-justify {
+	text-align: justify;
+	text-justify: inter-word;
 }
 </style>
