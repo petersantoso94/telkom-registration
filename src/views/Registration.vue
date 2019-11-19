@@ -114,10 +114,6 @@
 			<v-stepper-content step="2">
 				<v-card color="grey lighten-4" class="mb-12" height="auto">
 					<v-list dense>
-						<p
-							class="title text-center font-weight-bold"
-							style="text-decoration: underline;"
-						>SURAT PERNYATAAN</p>
 						<v-list-item>
 							<p
 								class="text-left text-justify"
