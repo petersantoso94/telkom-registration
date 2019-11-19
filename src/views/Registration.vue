@@ -112,14 +112,19 @@
 
 			<v-stepper-step :complete="steps > 2" color="red accent-4" step="2">Surat kuasa</v-stepper-step>
 			<v-stepper-content step="2">
-				<v-card color="grey lighten-4" class="mb-12" height="auto" style="font-size:90%;">
+				<v-card
+					color="grey lighten-4"
+					class="mb-12"
+					height="auto"
+					style="font-size:80%;margin-top:-10px"
+				>
 					<v-list dense>
 						<v-list-item>
 							<p
 								class="text-left text-justify"
 							>Saya, yang bertanda tangan di bawah ini, menyatakan dengan hormat mengajukan permohonan bantuan kepada Bagian Pelayanan Pelanggan Telkomsel (“GraPARI”) untuk melakukan registrasi nomor As2in1 atas nama saya di bawah ini:</p>
 						</v-list-item>
-						<v-container style="margin:5px;">
+						<v-container style="margin-left:5px;margin-top:-15px">
 							<v-row no-gutters>
 								<v-col cols="4" sm="4">
 									<v-card
@@ -195,26 +200,29 @@
 								class="text-left text-justify"
 							>Data-data yang disampaikan di atas adalah benar. Apabila saya memberikan data yang tidak sesuai dan bertentangan dengan peraturan perundang-undangan, maka saya bersedia menerima segala konsekuensi yang berlaku.</p>
 						</v-list-item>
+						<v-list-item>
+							<p
+								class="text-left text-justify"
+							>Saya secara berkala akan melakukan registrasi ulang untuk memastikan bahwa data-data yang saya sampaikan tervalidasi.</p>
+						</v-list-item>
 					</v-list>
-					<v-list-item>
+					<v-list-item style="margin-top:-15px">
 						<v-list-item-content class="text-left">Tanda Tangan:</v-list-item-content>
 					</v-list-item>
-					<v-list dense>
-						<VueSignaturePad
-							id="signature"
-							width="100%"
-							height="400px"
-							ref="signaturePad"
-							:options="options"
-						/>
-						<v-row style="margin-left:-5px">
-							<v-card-actions class="align-left" style="margin-top:10px">
-								<v-btn class="ma-1" small dark outlined color="grey" @click="undoSign">
-									<v-icon left>mdi-undo</v-icon>Undo
-								</v-btn>
-							</v-card-actions>
-						</v-row>
-					</v-list>
+					<VueSignaturePad
+						id="signature"
+						width="100%"
+						height="400px"
+						ref="signaturePad"
+						:options="options"
+					/>
+					<v-row style="margin-left:-5px">
+						<v-card-actions class="align-left" style="margin-top:10px">
+							<v-btn class="ma-1" small dark outlined color="grey" @click="undoSign">
+								<v-icon left>mdi-undo</v-icon>Undo
+							</v-btn>
+						</v-card-actions>
+					</v-row>
 				</v-card>
 				<v-btn outlined color="success" @click="register">Setuju</v-btn>
 				<v-btn text @click="steps--">Kembali</v-btn>
