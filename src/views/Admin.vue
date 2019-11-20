@@ -8,7 +8,14 @@
 				<v-btn class="ma-2" tile outlined color="success" @click="exportExcel">
 					<v-icon left>mdi-export</v-icon>Export
 				</v-btn>
-				<v-btn class="ma-2" tile outlined color="success" @click="showUploadExcel = true">
+				<v-btn
+					v-if="isSuperAdmin"
+					class="ma-2"
+					tile
+					outlined
+					color="success"
+					@click="showUploadExcel = true"
+				>
 					<v-icon left>mdi-import</v-icon>Import Mapping
 				</v-btn>
 				<v-spacer></v-spacer>
@@ -278,6 +285,7 @@ export default class Login extends Vue {
 	pdfDialog = false;
 	showUploadExcel = false;
 	showLoader = false;
+	isSuperAdmin = false;
 	baseUrl = "";
 
 	imgUrl = "";
@@ -509,6 +517,8 @@ export default class Login extends Vue {
 		} else {
 			this.baseUrl = "/api/uploads/";
 		}
+
+		this.isSuperAdmin = Cookies.get("admin_id") === "1";
 
 		this.adminDetail = {
 			username: Cookies.get("admin_username") || "admin",
