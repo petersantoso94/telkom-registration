@@ -430,12 +430,16 @@ export default class Login extends Vue {
 		adminApi.getIdPhone(requestOption).then(resp => {
 			if (!resp || resp.length === 0) {
 				// record not found
-				this.selectedCustomerPDF.idphone =
-					localMapper.filter(item => {
-						return (
-							item.country === this.selectedCustomerPDF.country
-						);
-					})[0].replace + "__________";
+				let localmapper = localMapper.filter(item => {
+					return item.country === this.selectedCustomerPDF.country;
+				});
+				if (localmapper.length > 0) {
+					this.selectedCustomerPDF.idphone =
+						localmapper[0].replace + "__________";
+				} else {
+					this.selectedCustomerPDF.idphone =
+						"+" + this.selectedCustomerPDF.phone;
+				}
 			} else {
 				this.selectedCustomerPDF.idphone = resp[0].idphone;
 			}

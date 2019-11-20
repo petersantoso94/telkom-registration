@@ -24,6 +24,7 @@
 						<v-text-field
 							v-model="phone"
 							prepend-icon="phone"
+							:prefix="phonePrefix"
 							type="number"
 							oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
 							:maxlength="phoneMaxLength"
@@ -244,6 +245,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import registrationApi from "@/api/registration";
 import countryMapper from "@/models/json/country.json";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 import kk from "@/assets/kk.jpg";
 import ktp from "@/assets/ktp.jpg";
 
@@ -253,6 +255,10 @@ export default class Login extends Vue {
 	errorMaxSize = "10 MB";
 	phoneMaxLength = 30;
 	country = "";
+	phonePrefix =
+		window.document.location.hostname.split(".")[0] === "regapps"
+			? "+"
+			: "";
 	showLoader = false;
 	showSignPad = false;
 	snack = false;
@@ -284,8 +290,15 @@ export default class Login extends Vue {
 			return "Harap isi nomor telpon anda";
 		},
 		v => {
-			if (this.mapCountry(v)) return true;
-			return "Nomor telpon bukan nomor As 2in1";
+			if (window.document.location.hostname.split(".")[0] === "regapps") {
+				let phonenumb = parsePhoneNumberFromString("+" + v);
+				if (!phonenumb || !phonenumb.isValid())
+					return "Nomor telpon yang dimasukkan tidak valid. Masukkan kode negara valid dan nomor telpon anda, contoh +852xxxxxx";
+				return true;
+			} else {
+				if (this.mapCountry(v)) return true;
+				return "Nomor telpon bukan nomor As 2in1";
+			}
 		},
 		v => (v && v.length <= 30) || "Nomor telpon harus kurang dari 30 angka"
 	];
@@ -330,6 +343,9 @@ export default class Login extends Vue {
 		if (!this.submitSign()) {
 			this.showLoader = false;
 			return;
+		}
+		if (window.document.location.hostname.split(".")[0] === "regapps") {
+			this.country = parsePhoneNumberFromString("+" + this.phone).country;
 		}
 		this.steps = 3;
 		let formData = new FormData();
