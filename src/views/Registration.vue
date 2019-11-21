@@ -254,6 +254,7 @@ export default class Login extends Vue {
 	maxSize = 10000000; // 10 mb
 	errorMaxSize = "10 MB";
 	phoneMaxLength = 30;
+	phoneExample = "";
 	country = "";
 	phonePrefix =
 		window.document.location.hostname.split(".")[0] === "regapps"
@@ -297,7 +298,11 @@ export default class Login extends Vue {
 				return true;
 			} else {
 				if (this.mapCountry(v)) return true;
-				return "Nomor telpon bukan nomor As 2in1";
+				return `Masukkan Nomor As2In1 ${
+					this.mapSubdomain().country
+				} yang anda gunakan tanpa country code (misal : ${
+					this.mapSubdomain().local
+				})`;
 			}
 		},
 		v => (v && v.length <= 30) || "Nomor telpon harus kurang dari 30 angka"
@@ -337,6 +342,38 @@ export default class Login extends Vue {
 			return true;
 		}
 	];
+
+	mapSubdomain() {
+		let selectedCountry = {};
+		switch (window.document.location.hostname.split(".")[0]) {
+			case "reghk":
+				selectedCountry = countryMapper[2];
+
+				break;
+			case "regtw":
+				selectedCountry = countryMapper[1];
+				break;
+			case "regmy":
+				selectedCountry = countryMapper[0];
+				break;
+			case "regapps":
+				selectedCountry = {
+					country: "Apps",
+					total: 30,
+					local: "+85282xxxxx"
+				};
+				break;
+			default:
+				break;
+		}
+		return selectedCountry;
+	}
+
+	mounted() {
+		this.country = this.mapSubdomain().country;
+		this.phoneMaxLength = this.mapSubdomain().total;
+		this.phoneExample = this.mapSubdomain().local;
+	}
 
 	register() {
 		this.showLoader = true;
@@ -517,21 +554,18 @@ export default class Login extends Vue {
 	}
 
 	mapCountry(numb) {
-		this.phoneMaxLength = 30;
 		if (!numb) return false;
 		numb = numb.toString();
 		let found = false;
 		countryMapper.forEach(element => {
 			element.prefix.forEach(prefix => {
 				if (
+					this.country === element.country &&
 					numb.indexOf(prefix) === 0 &&
 					numb.length === element.total &&
 					!found
 				) {
 					found = true;
-					this.country = element.country;
-					if (element.country === "Hongkong")
-						this.phoneMaxLength = element.total;
 				}
 			});
 		});

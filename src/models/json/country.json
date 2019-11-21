@@ -1,22 +1,26 @@
-[{
-        "country": "Malaysia",
-        "prefix": ["0"],
-        "total": 11,
-        "replace": "085112",
-        "total_replace": 6
-    },
-    {
-        "country": "Taiwan",
-        "prefix": ["09"],
-        "total": 10,
-        "replace": "085132",
-        "total_replace": 6
-    },
-    {
-        "country": "Hongkong",
-        "prefix": ["5", "6", "9"],
-        "total": 8,
-        "replace": "085202",
-        "total_replace": 6
-    }
+[
+  {
+    "country": "Malaysia",
+    "prefix": ["0"],
+    "total": 11,
+    "local": "05249xxxxxx",
+    "replace": "085112",
+    "total_replace": 6
+  },
+  {
+    "country": "Taiwan",
+    "prefix": ["09"],
+    "total": 10,
+    "local": "09869xxxx",
+    "replace": "085132",
+    "total_replace": 6
+  },
+  {
+    "country": "Hongkong",
+    "prefix": ["5", "6", "9"],
+    "total": 8,
+    "local": "5249xxxx",
+    "replace": "085202",
+    "total_replace": 6
+  }
 ]
