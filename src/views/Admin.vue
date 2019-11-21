@@ -89,7 +89,7 @@
 					<v-data-table
 						:headers="headersAdmin"
 						:items="admins"
-						:search="search"
+						:search="searchAdmin"
 						item-key="id"
 						class="elevation-1"
 					></v-data-table>
