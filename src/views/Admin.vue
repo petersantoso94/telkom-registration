@@ -1,71 +1,101 @@
 <template>
 	<v-app id="inspire">
-		<v-card>
-			<v-card-title>
-				Customers
-				<v-spacer></v-spacer>
-				<v-spacer></v-spacer>
-				<v-btn class="ma-2" tile outlined color="success" @click="exportExcel">
-					<v-icon left>mdi-export</v-icon>Export
-				</v-btn>
-				<v-btn
-					v-if="isSuperAdmin"
-					class="ma-2"
-					tile
-					outlined
-					color="success"
-					@click="showUploadExcel = true"
-				>
-					<v-icon left>mdi-import</v-icon>Import Mapping
-				</v-btn>
-				<v-spacer></v-spacer>
-				<v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details></v-text-field>
-			</v-card-title>
-			<v-data-table
-				v-model="selected"
-				:headers="headers"
-				:items="customers"
-				:search="search"
-				item-key="id"
-				class="elevation-1"
-			>
-				<template v-slot:item.status="{ item }">
-					<v-edit-dialog @save="save(item)" @cancel="cancel" @open="open" @close="close">
-						<v-chip :color="getColor(item.status)" dark>{{ item.status }}</v-chip>
-						<template v-slot:input>
-							<v-select
-								v-model="item.status"
-								:hint="`tekan 'enter' untuk menyimpan`"
-								:items="selectStatus"
-								item-text="text"
-								item-value="value"
-								label="status"
-								persistent-hint
-								return-value
-								single-line
-							></v-select>
+		<v-tabs v-model="tab" fixed-tabs background-color="indigo" dark>
+			<v-tab :href="`#customers`">Customers</v-tab>
+			<v-tab :href="`#admins`" v-if="isSuperAdmin">Admins</v-tab>
+
+			<v-tab-item :value="'customers'">
+				<v-card>
+					<v-card-title>
+						Customers List
+						<v-spacer></v-spacer>
+						<v-spacer></v-spacer>
+						<v-btn class="ma-2" tile outlined color="success" @click="exportExcel">
+							<v-icon left>mdi-export</v-icon>Export
+						</v-btn>
+						<v-btn
+							v-if="isSuperAdmin"
+							class="ma-2"
+							tile
+							outlined
+							color="success"
+							@click="showUploadExcel = true"
+						>
+							<v-icon left>mdi-import</v-icon>Import Mapping
+						</v-btn>
+						<v-spacer></v-spacer>
+						<v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details></v-text-field>
+					</v-card-title>
+					<v-data-table
+						v-model="selected"
+						:headers="headers"
+						:items="customers"
+						:search="search"
+						item-key="id"
+						class="elevation-1"
+					>
+						<template v-slot:item.status="{ item }">
+							<v-edit-dialog @save="save(item)" @cancel="cancel" @open="open" @close="close">
+								<v-chip :color="getColor(item.status)" dark>{{ item.status }}</v-chip>
+								<template v-slot:input>
+									<v-select
+										v-model="item.status"
+										:hint="`tekan 'enter' untuk menyimpan`"
+										:items="selectStatus"
+										item-text="text"
+										item-value="value"
+										label="status"
+										persistent-hint
+										return-value
+										single-line
+									></v-select>
+								</template>
+							</v-edit-dialog>
 						</template>
-					</v-edit-dialog>
-				</template>
 
-				<template v-slot:item.pkk="{ item }">
-					<v-btn color="primary" v-if="item.pkk" @click="openPhoto(item.pkk)" fab small dark>
-						<v-icon>pageview</v-icon>
-					</v-btn>
-				</template>
+						<template v-slot:item.pkk="{ item }">
+							<v-btn color="primary" v-if="item.pkk" @click="openPhoto(item.pkk)" fab small dark>
+								<v-icon>pageview</v-icon>
+							</v-btn>
+						</template>
 
-				<template v-slot:item.pktp="{ item }">
-					<v-btn color="primary" v-if="item.pktp" @click="openPhoto(item.pktp)" fab small dark>
-						<v-icon>pageview</v-icon>
-					</v-btn>
-				</template>
-				<template v-slot:item.updated_at="{ item }">
-					<v-btn color="primary" @click="showPDF(item.id)" fab small dark>
-						<v-icon>picture_as_pdf</v-icon>
-					</v-btn>
-				</template>
-			</v-data-table>
-		</v-card>
+						<template v-slot:item.pktp="{ item }">
+							<v-btn color="primary" v-if="item.pktp" @click="openPhoto(item.pktp)" fab small dark>
+								<v-icon>pageview</v-icon>
+							</v-btn>
+						</template>
+						<template v-slot:item.updated_at="{ item }">
+							<v-btn color="primary" @click="showPDF(item.id)" fab small dark>
+								<v-icon>picture_as_pdf</v-icon>
+							</v-btn>
+						</template>
+					</v-data-table>
+				</v-card>
+			</v-tab-item>
+
+			<v-tab-item :value="'admins'">
+				<v-card>
+					<v-card-title>
+						Admins List
+						<v-spacer></v-spacer>
+						<v-text-field
+							v-model="searchAdmin"
+							append-icon="search"
+							label="Search"
+							single-line
+							hide-details
+						></v-text-field>
+					</v-card-title>
+					<v-data-table
+						:headers="headersAdmin"
+						:items="admins"
+						:search="search"
+						item-key="id"
+						class="elevation-1"
+					></v-data-table>
+				</v-card>
+			</v-tab-item>
+		</v-tabs>
 		<v-dialog v-model="dialog" max-width="1000">
 			<v-card>
 				<v-card-title class="headline">Telin</v-card-title>
@@ -287,7 +317,7 @@ export default class Login extends Vue {
 	showLoader = false;
 	isSuperAdmin = false;
 	baseUrl = "";
-
+	tab = null;
 	imgUrl = "";
 	telinImg = {
 		Taiwan: telinTw,
@@ -303,6 +333,7 @@ export default class Login extends Vue {
 	arr_admin = [];
 	singleSelect = false;
 	search = "";
+	searchAdmin = "";
 	selected = [];
 	excelFile = [];
 	adminDetail = {};
@@ -322,7 +353,17 @@ export default class Login extends Vue {
 		{ text: "Status", value: "status" },
 		{ text: "Actions", value: "updated_at" }
 	];
+	headersAdmin = [
+		{
+			text: "id",
+			align: "left",
+			value: "id"
+		},
+		{ text: "Username", value: "username" },
+		{ text: "Role", value: "country" }
+	];
 	customers = [];
+	admins = [];
 
 	uploadExcelFile(files) {
 		this.showLoader = true;
@@ -527,6 +568,11 @@ export default class Login extends Vue {
 		adminApi.getCustomers().then(resp => {
 			this.customers = resp;
 		});
+		if (this.isSuperAdmin) {
+			adminApi.getAdmins().then(resp => {
+				this.admins = resp;
+			});
+		}
 	}
 }
 </script>

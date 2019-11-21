@@ -18,6 +18,14 @@ export default {
 		const result = await Handler.request(config);
 		return result.data;
 	},
+	async getAdmins() {
+		const config = {
+			url: `/admins`,
+			method: 'get',
+		};
+		const result = await Handler.request(config);
+		return result.data;
+	},
 	async updateCustomerStatus(data) {
 		const config = {
 			url: `/customer/${data.id}`,
