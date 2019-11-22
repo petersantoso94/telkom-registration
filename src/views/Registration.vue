@@ -228,9 +228,19 @@
 				<v-btn outlined color="success" @click="register">Setuju</v-btn>
 				<v-btn text @click="steps--">Kembali</v-btn>
 			</v-stepper-content>
+
+			<v-stepper-step :complete="steps > 3" color="red accent-4" step="3">Registrasi Berhasil</v-stepper-step>
+			<v-stepper-content step="3">
+				<v-btn
+					class="ma-2"
+					style="color:white"
+					color="red"
+					@click="reloadPage"
+				>Kembali ke halaman registrasi</v-btn>
+			</v-stepper-content>
 		</v-stepper>
 		<v-dialog v-model="showSignPad" max-width="600"></v-dialog>
-		<v-snackbar v-model="snack" :timeout="2000" :color="snackColor">
+		<v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
 			{{ snackText }}
 			<v-btn text @click="snack = false">Tutup</v-btn>
 		</v-snackbar>
@@ -375,6 +385,10 @@ export default class Login extends Vue {
 		this.phoneExample = this.mapSubdomain().local;
 	}
 
+	reloadPage() {
+		window.location.reload(false);
+	}
+
 	register() {
 		this.showLoader = true;
 		if (!this.submitSign()) {
@@ -401,7 +415,8 @@ export default class Login extends Vue {
 				if (resp.success) {
 					this.snack = true;
 					this.snackColor = "success";
-					this.snackText = "Pengumpulan surat kuasa berhasil";
+					this.snackText =
+						"Terima Kasih, Registrasi As 2in1 sudah berhasil";
 				} else {
 					this.steps = 2;
 
@@ -419,7 +434,7 @@ export default class Login extends Vue {
 					"Terjadi kesalahan pada server, silahkan kumpulkan ulang!";
 			})
 			.finally(() => {
-				this.clear();
+				// this.clear();
 				this.showLoader = false;
 			});
 	}

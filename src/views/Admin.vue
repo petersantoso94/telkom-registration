@@ -92,7 +92,26 @@
 						:search="searchAdmin"
 						item-key="id"
 						class="elevation-1"
-					></v-data-table>
+					>
+						<template v-slot:item.country="{ item }">
+							<v-edit-dialog @save="saveAdmin(item)" @cancel="cancel" @open="open" @close="close">
+								<v-chip dark>{{ item.country }}</v-chip>
+								<template v-slot:input>
+									<v-select
+										v-model="item.country"
+										:hint="`tekan 'enter' untuk menyimpan`"
+										:items="selectCountry"
+										item-text="text"
+										item-value="value"
+										label="roles"
+										persistent-hint
+										return-value
+										single-line
+									></v-select>
+								</template>
+							</v-edit-dialog>
+						</template>
+					</v-data-table>
 				</v-card>
 			</v-tab-item>
 		</v-tabs>
@@ -325,6 +344,7 @@ export default class Login extends Vue {
 		Hongkong: telinHk
 	};
 	selectStatus = ["approved", "rejected", "pending"];
+	selectCountry = ["Hongkong", "Malaysia", "Taiwan", "Apps", "All"];
 	selectedCustomerPDF = {};
 	snackColor = "";
 	snackText = "";
@@ -536,6 +556,24 @@ export default class Login extends Vue {
 			}
 		});
 	}
+
+	saveAdmin(param) {
+		let { country, id } = param;
+		let updateAdminRequest = {
+			country: country,
+			id: id,
+			admin_id: this.adminDetail.id
+		};
+
+		adminApi.updateAdminRole(updateAdminRequest).then(resp => {
+			if (resp.success) {
+				this.snack = true;
+				this.snackColor = "success";
+				this.snackText = "Sukses menyimpan data";
+			}
+		});
+	}
+
 	cancel() {
 		this.snack = true;
 		this.snackColor = "error";

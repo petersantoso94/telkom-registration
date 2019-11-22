@@ -35,6 +35,15 @@ export default {
 		const result = await Handler.request(config);
 		return result.data;
 	},
+	async updateAdminRole(data) {
+		const config = {
+			url: `/admin/${data.id}`,
+			method: 'patch',
+			data,
+		};
+		const result = await Handler.request(config);
+		return result.data;
+	},
 	async updateMapper(data) {
 		const config = {
 			url: `/mapper`,
