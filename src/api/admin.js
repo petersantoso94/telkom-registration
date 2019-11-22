@@ -44,6 +44,24 @@ export default {
 		const result = await Handler.request(config);
 		return result.data;
 	},
+	async deleteAdmin(data) {
+		const config = {
+			url: `/admin/${data.id}`,
+			method: 'delete',
+			data,
+		};
+		const result = await Handler.request(config);
+		return result.data;
+	},
+	async addAdmin(data) {
+		const config = {
+			url: `/admin`,
+			method: 'post',
+			data,
+		};
+		const result = await Handler.request(config);
+		return result.data;
+	},
 	async updateMapper(data) {
 		const config = {
 			url: `/mapper`,

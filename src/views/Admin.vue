@@ -78,7 +78,8 @@
 					<v-card-title>
 						Admins List
 						<v-spacer></v-spacer>
-						<v-text-field
+						<v-btn color="primary" dark class="mb-2" @click="showInsertAdmin = true">New Admin</v-btn>
+						<v-spacer></v-spacer><v-text-field
 							v-model="searchAdmin"
 							append-icon="search"
 							label="Search"
@@ -93,6 +94,9 @@
 						item-key="id"
 						class="elevation-1"
 					>
+						<template v-slot:item.updated_at="{ item }">
+							<v-icon small @click="deleteAdmin(item)">delete</v-icon>
+						</template>
 						<template v-slot:item.country="{ item }">
 							<v-edit-dialog @save="saveAdmin(item)" @cancel="cancel" @open="open" @close="close">
 								<v-chip dark>{{ item.country }}</v-chip>
@@ -115,6 +119,59 @@
 				</v-card>
 			</v-tab-item>
 		</v-tabs>
+		<v-dialog v-model="showInsertAdmin" max-width="500px">
+			<v-card>
+				<v-card-title>
+					<span class="headline">Tambah Admin</span>
+				</v-card-title>
+
+				<v-card-text>
+					<v-container>
+						<v-form ref="form" lazy-validation>
+						<v-row>
+							
+							<v-col cols="12" sm="6" md="4">
+								<v-text-field :rules="nameRules" v-model="newAdmin.username" label="Username"></v-text-field>
+							</v-col>
+							<v-col cols="12" sm="6" md="4">
+								<v-text-field
+									v-model="newAdmin.password"
+									:append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+									:rules="[rules.required, rules.min]"
+									:type="showPass ? 'text' : 'password'"
+									name="input-10-1"
+									label="Password"
+									ref="adminPasswordInput"
+									hint="At least 8 characters"
+									counter
+									@click:append="showPass = !showPass"
+								></v-text-field>
+							</v-col>
+							<v-col cols="12" sm="6" md="4">
+							<v-select
+										v-model="newAdmin.country"
+										:items="selectCountry"
+										:rules="nameRules"
+										item-text="text"
+										item-value="value"
+										label="Roles"
+										persistent-hint
+										return-value
+										single-line
+									></v-select>
+									</v-col>
+						</v-row>
+							</v-form>
+					</v-container>
+				</v-card-text>
+
+				<v-card-actions>
+					<v-spacer></v-spacer>
+					<v-btn color="blue darken-1" text @click="showInsertAdmin = false">Batal</v-btn>
+					<v-btn color="blue darken-1" text @click="addAdmin">Simpan</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
 		<v-dialog v-model="dialog" max-width="1000">
 			<v-card>
 				<v-card-title class="headline">Telin</v-card-title>
@@ -329,15 +386,19 @@ import localMapper from "@/models/json/country.json";
 
 @Component()
 export default class Login extends Vue {
+	md5 = require('md5');
 	snack = false;
 	dialog = false;
 	pdfDialog = false;
 	showUploadExcel = false;
 	showLoader = false;
 	isSuperAdmin = false;
+	showInsertAdmin = false;
+	showPass = false;
 	baseUrl = "";
 	tab = null;
 	imgUrl = "";
+	newAdmin = {};
 	telinImg = {
 		Taiwan: telinTw,
 		Malaysia: telinMalay,
@@ -380,10 +441,19 @@ export default class Login extends Vue {
 			value: "id"
 		},
 		{ text: "Username", value: "username" },
-		{ text: "Role", value: "country" }
+		{ text: "Role", value: "country" },
+		{ text: "Actions", value: "updated_at" }
 	];
 	customers = [];
 	admins = [];
+
+	rules = {
+		required: value => !!value || "required",
+		min: v => v&&v.length >= 8 || "Min 8 characters"
+	};
+	nameRules = [
+		v => !!v || "required"
+	];
 
 	uploadExcelFile(files) {
 		this.showLoader = true;
@@ -574,6 +644,47 @@ export default class Login extends Vue {
 		});
 	}
 
+	deleteAdmin(param) {
+		if (confirm("Are you sure you want to delete this admin?")) {
+			const index = this.admins.indexOf(param);
+			let { id } = param;
+			let deleteAdminRequest = {
+				id: id,
+				admin_id: this.adminDetail.id
+			};
+			adminApi.deleteAdmin(deleteAdminRequest).then(resp => {
+				if (resp.success) {
+					this.admins.splice(index, 1);
+					this.snack = true;
+					this.snackColor = "success";
+					this.snackText = "Sukses menghapus data admin";
+				}
+			});
+		}
+	}
+
+	addAdmin(){
+		if (this.$refs.form.validate()) {
+		let addAdminRequest = {
+				username: this.newAdmin.username,
+				password: this.md5(this.newAdmin.password),
+				country: this.newAdmin.country,
+				admin_id: this.adminDetail.id
+			};
+			adminApi.addAdmin(addAdminRequest).then(resp => {
+				if (resp.success) {
+					this.newAdmin = {}
+					this.showInsertAdmin = false
+					this.$refs.form.resetValidation();
+					this.getAdminList()
+					this.snack = true;
+					this.snackColor = "success";
+					this.snackText = "Sukses menambahkan data admin";
+				}
+			});
+		}
+	}
+
 	cancel() {
 		this.snack = true;
 		this.snackColor = "error";
@@ -585,6 +696,12 @@ export default class Login extends Vue {
 		this.snackText = "Mengubah";
 	}
 	close() {}
+
+	getAdminList() {
+		adminApi.getAdmins().then(resp => {
+			this.admins = resp;
+		});
+	}
 
 	mounted() {
 		if (process.env.NODE_ENV === "development") {
@@ -607,9 +724,7 @@ export default class Login extends Vue {
 			this.customers = resp;
 		});
 		if (this.isSuperAdmin) {
-			adminApi.getAdmins().then(resp => {
-				this.admins = resp;
-			});
+			this.getAdminList();
 		}
 	}
 }
