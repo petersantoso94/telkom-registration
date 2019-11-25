@@ -30,9 +30,9 @@
 						<v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details></v-text-field>
 					</v-card-title>
 					<v-data-table
-						v-model="selected"
+						v-model="selectedCustomer"
 						:headers="headers"
-						:items="customers"
+						:items="customers" show-select
 						:search="search"
 						item-key="id"
 						class="elevation-1"
@@ -383,6 +383,7 @@ import html2canvas from "html2canvas";
 import { SystemAlert } from "@/utilities/event-bus";
 import { MsgPopupType } from "@/models/status/message";
 import jsPdf from "jspdf";
+import countryMapper from "@/models/json/country.json";
 import { json2excel } from "js2excel";
 import XLSX from "xlsx";
 import telinHk from "@/assets/telin-Hongkong.jpg";
@@ -404,6 +405,7 @@ export default class Login extends Vue {
 	baseUrl = "";
 	tab = null;
 	isExportAllPDF = false;
+	selectedCustomer = [];
 	imgUrl = "";
 	allPDF = 0;
 	newAdmin = {};
@@ -566,11 +568,23 @@ export default class Login extends Vue {
 	}
 
 	exportAllPDF(){
+		if(this.selectedCustomer.length > 25){
+			this.snack = true;
+			this.snackColor = "error";
+			this.snackText = "Tidak bisa export lebih dari 25 data";
+			return;
+		}
+		if(this.selectedCustomer.length === 0 ){
+			this.snack = true;
+			this.snackColor = "error";
+			this.snackText = "Minimal export 1 data";
+			return;
+		}
 		this.allPDF = 0
 		this.isExportAllPDF = true;
 		this.showLoader = true;
 		this.selectedCustomerPDFs = []
-		this.customers.forEach(async (item)=>{
+		this.selectedCustomer.forEach(async (item)=>{
 			await this.showPDF(item.id)
 		})
 	}
@@ -603,11 +617,11 @@ export default class Login extends Vue {
 			this.selectedCustomerPDFs.push(selectedCustomerPDF)
 			this.allPDF += 1;
 			this.pdfDialog = true;
-			if(this.isExportAllPDF && this.allPDF === this.customers.length){
+			if(this.isExportAllPDF && this.allPDF === this.selectedCustomer.length){
 				// all request done
 				setTimeout(() => {
 					this.exportPDF()
-				}, 50*this.customers.length);
+				}, 100*this.selectedCustomer.length);
 			}else{
 				if(!this.isExportAllPDF){
 					this.showLoader = false;
@@ -616,6 +630,32 @@ export default class Login extends Vue {
 
 			return Promise.resolve("true")
 		});
+	}
+
+	mapSubdomain() {
+		let selectedCountry = {};
+		switch (window.document.location.hostname.split(".")[0]) {
+			case "reghk":
+				selectedCountry = countryMapper[2];
+
+				break;
+			case "regtw":
+				selectedCountry = countryMapper[1];
+				break;
+			case "regmy":
+				selectedCountry = countryMapper[0];
+				break;
+			case "regapps":
+				selectedCountry = {
+					country: "Apps",
+					total: 30,
+					local: "+85282xxxxx"
+				};
+				break;
+			default:
+				break;
+		}
+		return selectedCountry;
 	}
 
 	exportPDF() {
@@ -637,14 +677,16 @@ export default class Login extends Vue {
 			let imgHeight = imgPage.height * imgWidth / imgPage.width;
 			pdf.addImage(contentDataURL, "JPEG", 0 , position , imgWidth, imgHeight);
 			if(domElements.length -1  === counter){
-				pdf.save(
-					this.selectedCustomerPDFs[0].country +
+				const pdfName =(this.isExportAllPDF?(this.mapSubdomain().country + ".pdf"):(this.selectedCustomerPDFs[0].country +
 						"-" +
 						this.selectedCustomerPDFs[0].phone +
-						".pdf"
+						".pdf"))
+				pdf.save(
+					pdfName
 				);
 				this.showLoader = false;
 				this.selectedCustomerPDFs = [];
+				this.selectedCustomer = [];
 				this.pdfDialog = false;
 				this.isExportAllPDF = false;
 			}
