@@ -568,10 +568,10 @@ export default class Login extends Vue {
 	}
 
 	exportAllPDF(){
-		if(this.selectedCustomer.length > 25){
+		if(this.selectedCustomer.length > 20){
 			this.snack = true;
 			this.snackColor = "error";
-			this.snackText = "Tidak bisa export lebih dari 25 data";
+			this.snackText = "Tidak bisa export lebih dari 20 data";
 			return;
 		}
 		if(this.selectedCustomer.length === 0 ){
@@ -621,7 +621,7 @@ export default class Login extends Vue {
 				// all request done
 				setTimeout(() => {
 					this.exportPDF()
-				}, 100*this.selectedCustomer.length);
+				}, 300*this.selectedCustomer.length);
 			}else{
 				if(!this.isExportAllPDF){
 					this.showLoader = false;
