@@ -11,7 +11,10 @@
 						<v-spacer></v-spacer>
 						<v-spacer></v-spacer>
 						<v-btn class="ma-2" tile outlined color="success" @click="exportExcel">
-							<v-icon left>mdi-export</v-icon>Export
+							<v-icon left>mdi-export</v-icon>Export CSV
+						</v-btn>
+						<v-btn class="ma-2" tile outlined color="success" @click="exportAllPDF">
+							<v-icon left>mdi-export</v-icon>Export PDF
 						</v-btn>
 						<v-btn
 							v-if="isSuperAdmin"
@@ -210,18 +213,19 @@
 			<v-card>
 				<v-toolbar dark color="primary">
 					<v-btn icon dark @click="()=>{
-						selectedCustomerPDF ={}
-						pdfDialog = false}">
+						selectedCustomerPDFs =[];
+						allPDF = 0;
+						pdfDialog = false;}">
 						<v-icon>mdi-close</v-icon>
 					</v-btn>
-					<v-toolbar-title>Surat Kuasa dari: {{selectedCustomerPDF.name}}</v-toolbar-title>
+					<v-toolbar-title>Surat Kuasa dari: {{selectedCustomerPDFs.length === 1?selectedCustomerPDFs[0].name:"All"}}</v-toolbar-title>
 					<v-spacer></v-spacer>
 					<v-toolbar-items>
 						<v-btn dark text @click="exportPDF">Export</v-btn>
 					</v-toolbar-items>
 				</v-toolbar>
-				<v-list dense id="pdf-for-print" class="pdfa4paper">
-					<div class="pdfWrapper">
+				<v-list dense id="pdf-for-print">
+					<div class="pdfWrapper pdfa4paper" v-for="selectedCustomerPDF in selectedCustomerPDFs" :key="selectedCustomerPDF.id">
 						<v-card
 							class="d-flex flex-row justify-end"
 							style="box-shadow: 0px 0px 0px #FFFFFF !important;"
@@ -229,6 +233,7 @@
 						>
 							<v-img
 								class="align-end"
+								:eager="true"
 								:src="telinImg[selectedCustomerPDF.country]"
 								height="100"
 								max-width="100"
@@ -344,6 +349,7 @@
 						<v-list-item class="d-flex flex-row justify-end">
 							<v-img
 								crossorigin="anonymous"
+								:eager="true"
 								:src="selectedCustomerPDF.psignUrl"
 								height="100"
 								max-width="100"
@@ -397,7 +403,9 @@ export default class Login extends Vue {
 	showPass = false;
 	baseUrl = "";
 	tab = null;
+	isExportAllPDF = false;
 	imgUrl = "";
+	allPDF = 0;
 	newAdmin = {};
 	telinImg = {
 		Taiwan: telinTw,
@@ -406,7 +414,7 @@ export default class Login extends Vue {
 	};
 	selectStatus = ["approved", "rejected", "pending"];
 	selectCountry = ["Hongkong", "Malaysia", "Taiwan", "Apps", "All"];
-	selectedCustomerPDF = {};
+	selectedCustomerPDFs = [];
 	snackColor = "";
 	snackText = "";
 	localnumber = [];
@@ -557,57 +565,91 @@ export default class Login extends Vue {
 		}
 	}
 
+	exportAllPDF(){
+		this.allPDF = 0
+		this.isExportAllPDF = true;
+		this.showLoader = true;
+		this.selectedCustomerPDFs = []
+		this.customers.forEach(async (item)=>{
+			await this.showPDF(item.id)
+		})
+	}
+
 	showPDF(id) {
-		this.selectedCustomerPDF = this.customers.filter(item => {
+		let selectedCustomerPDF = this.customers.filter(item => {
 			return item.id === id;
 		})[0];
-		this.selectedCustomerPDF.psignUrl =
-			this.baseUrl + this.selectedCustomerPDF.psign;
+		selectedCustomerPDF.psignUrl =
+			this.baseUrl + selectedCustomerPDF.psign;
 		const requestOption = {
-			localphone: this.selectedCustomerPDF.phone
+			localphone: selectedCustomerPDF.phone
 		};
 		adminApi.getIdPhone(requestOption).then(resp => {
 			if (!resp || resp.length === 0) {
 				// record not found
 				let localmapper = localMapper.filter(item => {
-					return item.country === this.selectedCustomerPDF.country;
+					return item.country === selectedCustomerPDF.country;
 				});
 				if (localmapper.length > 0) {
-					this.selectedCustomerPDF.idphone =
+					selectedCustomerPDF.idphone =
 						localmapper[0].replace + "__________";
 				} else {
-					this.selectedCustomerPDF.idphone =
-						"+" + this.selectedCustomerPDF.phone;
+					selectedCustomerPDF.idphone =
+						"+" + selectedCustomerPDF.phone;
 				}
 			} else {
-				this.selectedCustomerPDF.idphone = resp[0].idphone;
+				selectedCustomerPDF.idphone = resp[0].idphone;
 			}
+			this.selectedCustomerPDFs.push(selectedCustomerPDF)
+			this.allPDF += 1;
 			this.pdfDialog = true;
+			if(this.isExportAllPDF && this.allPDF === this.customers.length){
+				// all request done
+				setTimeout(() => {
+					this.exportPDF()
+				}, 50*this.customers.length);
+			}else{
+				if(!this.isExportAllPDF){
+					this.showLoader = false;
+				}
+			}
+
+			return Promise.resolve("true")
 		});
 	}
 
 	exportPDF() {
-		const domElement = document.getElementById("pdf-for-print");
-		html2canvas(domElement, {
-			dpi: 300, // Set to 300 DPI
-			scale: 2,
-			useCORS: true
-		})
-			.then(canvas => {
-				const img = canvas.toDataURL("image/png");
-				const pdf = new jsPdf("p", "mm", "a4");
-				pdf.addImage(img, "JPEG", 0, -14, 211, 320);
+		this.showLoader =true;
+		const pdf = new jsPdf("p", "mm", "a4");		
+		const domElements = document.querySelectorAll(".pdfa4paper");
+		const position = 0;
+		const imgWidth = 211
+		let counter = 0;
+		domElements.forEach(async element => {
+			const imgPage = await html2canvas(element, {
+				dpi: 300, // Set to 300 DPI
+				scale: 2,
+				useCORS: true
+			})
+			if(counter !== 0)
+				pdf.addPage();
+			let contentDataURL = await imgPage.toDataURL('image/png');
+			let imgHeight = imgPage.height * imgWidth / imgPage.width;
+			pdf.addImage(contentDataURL, "JPEG", 0 , position , imgWidth, imgHeight);
+			if(domElements.length -1  === counter){
 				pdf.save(
-					this.selectedCustomerPDF.country +
+					this.selectedCustomerPDFs[0].country +
 						"-" +
-						this.selectedCustomerPDF.phone +
+						this.selectedCustomerPDFs[0].phone +
 						".pdf"
 				);
-			})
-			.finally(() => {
+				this.showLoader = false;
+				this.selectedCustomerPDFs = [];
 				this.pdfDialog = false;
-				this.selectedCustomerPDF = {};
-			});
+				this.isExportAllPDF = false;
+			}
+			counter++;
+		});
 	}
 
 	save(param) {
@@ -731,6 +773,13 @@ export default class Login extends Vue {
 </script>
 
 <style>
+.pdfWrapper {
+	padding-right: 20px;
+	padding-top: 20px;
+	background: white;
+	width: 100%;
+	height: 100%;
+}
 .pdfa4paper {
 	width: 22cm;
 	height: 30cm;
@@ -739,15 +788,18 @@ export default class Login extends Vue {
 	margin: 0 auto;
 	/* box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5); */
 }
-.pdfWrapper {
-	padding-right: 20px;
-	padding-top: 20px;
-	background: white;
-	width: 100%;
-	height: 100%;
-}
 .text-justify {
 	text-align: justify;
 	text-justify: inter-word;
 }
+body{
+	overflow-y: scroll;
+}
+
+@media print {
+  .pdfa4paper 
+  {
+   page-break-after:always;
+  }
+ }
 </style>
