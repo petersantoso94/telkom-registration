@@ -668,14 +668,14 @@ export default class Login extends Vue {
 		domElements.forEach(async element => {
 			const imgPage = await html2canvas(element, {
 				dpi: 300, // Set to 300 DPI
-				scale: 2,
+				scale: 0.9,
 				useCORS: true
 			})
 			if(counter !== 0)
 				pdf.addPage();
 			let contentDataURL = await imgPage.toDataURL('image/png');
 			let imgHeight = imgPage.height * imgWidth / imgPage.width;
-			pdf.addImage(contentDataURL, "JPEG", 0 , position , imgWidth, imgHeight);
+			pdf.addImage(contentDataURL, "JPEG", 0 , position , imgWidth, imgHeight,undefined,'FAST');
 			if(domElements.length -1  === counter){
 				const pdfName =(this.isExportAllPDF?(this.mapSubdomain().country + ".pdf"):(this.selectedCustomerPDFs[0].country +
 						"-" +
