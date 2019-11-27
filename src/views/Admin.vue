@@ -214,7 +214,6 @@
 				<v-toolbar dark color="primary">
 					<v-btn icon dark @click="()=>{
 						selectedCustomerPDFs =[];
-						allPDF = 0;
 						pdfDialog = false;}">
 						<v-icon>mdi-close</v-icon>
 					</v-btn>
@@ -407,7 +406,6 @@ export default class Login extends Vue {
 	isExportAllPDF = false;
 	selectedCustomer = [];
 	imgUrl = "";
-	allPDF = 0;
 	newAdmin = {};
 	telinImg = {
 		Taiwan: telinTw,
@@ -568,10 +566,10 @@ export default class Login extends Vue {
 	}
 
 	exportAllPDF(){
-		if(this.selectedCustomer.length > 20){
+		if(this.selectedCustomer.length > 50){
 			this.snack = true;
 			this.snackColor = "error";
-			this.snackText = "Tidak bisa export lebih dari 20 data";
+			this.snackText = "Tidak bisa export lebih dari 50 data";
 			return;
 		}
 		if(this.selectedCustomer.length === 0 ){
@@ -580,7 +578,6 @@ export default class Login extends Vue {
 			this.snackText = "Minimal export 1 data";
 			return;
 		}
-		this.allPDF = 0
 		this.isExportAllPDF = true;
 		this.showLoader = true;
 		this.selectedCustomerPDFs = []
@@ -615,13 +612,12 @@ export default class Login extends Vue {
 				selectedCustomerPDF.idphone = resp[0].idphone;
 			}
 			this.selectedCustomerPDFs.push(selectedCustomerPDF)
-			this.allPDF += 1;
 			this.pdfDialog = true;
-			if(this.isExportAllPDF && this.allPDF === this.selectedCustomer.length){
+			if(this.isExportAllPDF && this.selectedCustomerPDFs.length === this.selectedCustomer.length){
 				// all request done
 				setTimeout(() => {
 					this.exportPDF()
-				}, 300*this.selectedCustomer.length);
+				}, 200*this.selectedCustomer.length);
 			}else{
 				if(!this.isExportAllPDF){
 					this.showLoader = false;
