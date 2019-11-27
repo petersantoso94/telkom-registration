@@ -235,8 +235,8 @@
 								class="align-end"
 								:eager="true"
 								:src="telinImg[selectedCustomerPDF.country]"
-								height="100"
-								max-width="100"
+								height="200"
+								max-width="200"
 								:contain="true"
 								v-if="telinImg[selectedCustomerPDF.country]"
 								style="margin-left:5px;margin-right:5px;box-shadow: 0px 0px 0px #FFFFFF !important;"
@@ -816,8 +816,6 @@ export default class Login extends Vue {
 
 <style>
 .pdfWrapper {
-	padding-right: 20px;
-	padding-top: 20px;
 	background: white;
 	width: 100%;
 	height: 100%;
@@ -826,7 +824,9 @@ export default class Login extends Vue {
 	width: 22cm;
 	height: 30cm;
 	display: block;
-	padding: 20px;
+	padding-left: 30mm;
+	padding-right: 30mm;
+	padding-top: -20mm;
 	margin: 0 auto;
 	/* box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5); */
 }
