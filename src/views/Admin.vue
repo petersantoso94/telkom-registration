@@ -621,7 +621,7 @@ export default class Login extends Vue {
 				// all request done
 				setTimeout(() => {
 					this.exportPDF()
-				}, 300*this.selectedCustomer.length);
+				}, 500*this.selectedCustomer.length);
 			}else{
 				if(!this.isExportAllPDF){
 					this.showLoader = false;
