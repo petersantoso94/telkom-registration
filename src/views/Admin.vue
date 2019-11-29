@@ -34,6 +34,10 @@
 						:headers="headers"
 						:items="customers" show-select
 						:search="search"
+						:footer-props="{
+							'items-per-page-options': [50, 100, 150, 200]
+						}"
+						:items-per-page="50"
 						item-key="id"
 						class="elevation-1"
 					>
