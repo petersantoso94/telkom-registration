@@ -15,6 +15,8 @@
 					<v-form style="padding:5px 10px" ref="form" v-model="valid" lazy-validation>
 						<v-text-field
 							v-model="name"
+							data-testid="inputName"
+							ref="inputNameRef"
 							:counter="50"
 							prepend-icon="account_box"
 							:rules="nameRules"
@@ -25,6 +27,8 @@
 							v-model="phone"
 							prepend-icon="phone"
 							:prefix="phonePrefix"
+							data-testid="inputNumber"
+							ref="inputNumberRef"
 							type="number"
 							oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
 							:maxlength="phoneMaxLength"
@@ -104,6 +108,7 @@
 				</v-card>
 				<v-btn
 					outlined
+					data-testid = "btn-first-submit"
 					color="success"
 					@click="submitFirst"
 					style="margin-top:-10px; margin-bottom:5px;"
