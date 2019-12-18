@@ -42,6 +42,9 @@
 							prepend-icon="mdi-account-card-details"
 							type="number"
 							oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+
+							data-testid="inputNIK"
+							ref="inputNIKRef"
 							maxlength="16"
 							:counter="16"
 							:rules="nikRules"
@@ -60,6 +63,8 @@
 							prepend-icon="mdi-account-card-details"
 							type="number"
 							oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+							data-testid="inputNOKK"
+							ref="inputNOKKRef"
 							maxlength="16"
 							:counter="16"
 							:rules="nokkRules"
@@ -73,6 +78,7 @@
 							show-size
 							:rules="rulespkk"
 							ref="pkkInput"
+							data-testid="inputPKK"
 							v-model="pkk"
 							@change="onPKKPicked"
 							accept="image/png, image/jpeg, image/bmp"
