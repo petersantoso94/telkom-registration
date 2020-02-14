@@ -1,10 +1,10 @@
 # build environment
-FROM node:12.10.0-alpine as build
+FROM node:alpine as build
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 COPY package.json /app/package.json
 RUN apk update && apk add git && rm -rf /var/cache/apk/*
-RUN npm install --silent
+RUN npm install --production
 RUN npm install @vue/cli@3.7.0 -g
 COPY . /app
 RUN npm run build
