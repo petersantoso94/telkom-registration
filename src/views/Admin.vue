@@ -441,7 +441,7 @@ export default class Login extends Vue {
 		{ text: "NIK", value: "nik" },
 		{ text: "Nomor KK", value: "nokk" },
 		{ text: "Foto KK", value: "pkk" },
-		{ text: "Foto KTP", value: "pktp" },
+		{ text: "Foto KTP / Selfie Passport", value: "pktp" },
 		{ text: "Waktu Register", value: "created_at" },
 		{ text: "Status", value: "status" },
 		{ text: "Actions", value: "updated_at" }

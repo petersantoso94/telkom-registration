@@ -83,7 +83,7 @@
 							@change="onPKKPicked"
 							accept="image/png, image/jpeg, image/bmp"
 							prepend-icon="mdi-camera"
-							label="Foto Kartu Keluarga"
+							label="Foto Kartu Keluarga (*untuk registrasi nomor Indonesia) atau Passport (*untuk registrasi paypal)"
 							required
 						></v-file-input>
 						<v-img
@@ -93,6 +93,9 @@
 							v-if="pkkUrl"
 							style="margin-left:5px;margin-right:5px;"
 						/>
+
+						<div class="subheading text-left">Contoh:</div>
+						<v-img :src="passportExUrl" height="200" :contain="true" style="margin-left:5px;margin-right:5px;" />
 						<v-file-input
 							show-size
 							v-model="pktp"
@@ -101,7 +104,7 @@
 							@change="onPKTPPicked"
 							accept="image/png, image/jpeg, image/bmp"
 							prepend-icon="mdi-camera"
-							label="Foto e-KTP"
+							label="Foto Selfie pegang passport (*untuk registrasi Paypal)"
 						></v-file-input>
 						<v-img
 							:src="pktpUrl"
@@ -269,6 +272,7 @@ import countryMapper from "@/models/json/country.json";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import kk from "@/assets/kk.jpg";
 import ktp from "@/assets/ktp.jpg";
+import passport from "@/assets/passport.jpg";
 
 @Component()
 export default class Login extends Vue {
@@ -290,6 +294,7 @@ export default class Login extends Vue {
 	pktpUrl = "";
 	kkexUrl = kk;
 	ktpexUrl = ktp;
+	passportExUrl = passport;
 	pktp = [];
 	pkk = [];
 	psign = [];
