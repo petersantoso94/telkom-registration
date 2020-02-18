@@ -83,7 +83,7 @@
 							@change="onPKKPicked"
 							accept="image/png, image/jpeg, image/bmp"
 							prepend-icon="mdi-camera"
-							label="Foto Kartu Keluarga (*untuk registrasi nomor Indonesia) atau Passport (*untuk registrasi paypal)"
+							label="Registrasi Virtual Number (Upload foto Kartu Keluarga)"
 							required
 						></v-file-input>
 						<v-img
@@ -104,7 +104,7 @@
 							@change="onPKTPPicked"
 							accept="image/png, image/jpeg, image/bmp"
 							prepend-icon="mdi-camera"
-							label="Foto Selfie pegang passport (*untuk registrasi Paypal)"
+							label="Registrasi Paypal (Upload foto selfie pegang Passport)"
 						></v-file-input>
 						<v-img
 							:src="pktpUrl"
