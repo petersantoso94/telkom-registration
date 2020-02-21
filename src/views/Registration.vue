@@ -83,7 +83,7 @@
 							@change="onPKKPicked"
 							accept="image/png, image/jpeg, image/bmp"
 							prepend-icon="mdi-camera"
-							label="Registrasi Virtual Number (Upload foto Kartu Keluarga)"
+							:label="isRegApps?'Registrasi Virtual Number (Upload foto Kartu Keluarga)':'Foto Kartu Keluarga'"
 							required
 						></v-file-input>
 						<v-img
@@ -94,8 +94,8 @@
 							style="margin-left:5px;margin-right:5px;"
 						/>
 
-						<div class="subheading text-left">Contoh:</div>
-						<v-img :src="passportExUrl" height="200" :contain="true" style="margin-left:5px;margin-right:5px;" />
+						<div v-if="isRegApps" class="subheading text-left">Contoh:</div>
+						<v-img v-if="isRegApps" :src="passportExUrl" height="200" :contain="true" style="margin-left:5px;margin-right:5px;" />
 						<v-file-input
 							show-size
 							v-model="pktp"
@@ -104,7 +104,7 @@
 							@change="onPKTPPicked"
 							accept="image/png, image/jpeg, image/bmp"
 							prepend-icon="mdi-camera"
-							label="Registrasi Paypal (Upload foto selfie pegang Passport)"
+							:label="isRegApps?'Registrasi Paypal (Upload foto selfie pegang Passport)':'Foto e-KTP'"
 						></v-file-input>
 						<v-img
 							:src="pktpUrl"
@@ -285,6 +285,7 @@ export default class Login extends Vue {
 		window.document.location.hostname.split(".")[0] === "regapps"
 			? "+"
 			: "";
+	isRegApps = window.document.location.hostname.split(".")[0] === "regapps";
 	showLoader = false;
 	showSignPad = false;
 	snack = false;
